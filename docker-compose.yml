@@ -1,4 +1,18 @@
 services:
+  api:
+    build: ./backend
+    environment:
+      DWCO_DATABASE_URL: postgresql+psycopg://dwco:dwco@postgres:5432/dwco
+      DWCO_REDIS_URL: redis://redis:6379/0
+      DWCO_JWT_SECRET: local-compose-secret-change-before-any-shared-use
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   postgres:
     image: postgres:17-alpine
     environment:
@@ -9,11 +23,21 @@ services:
       - "5432:5432"
     volumes:
       - dwco_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dwco -d dwco"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   dwco_postgres:

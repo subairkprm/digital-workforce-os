@@ -1,0 +1,44 @@
+[project]
+name = "dwco-api"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "alembic>=1.13,<2",
+  "email-validator>=2.2,<3",
+  "fastapi>=0.115,<1",
+  "psycopg[binary]>=3.2,<4",
+  "pydantic-settings>=2.6,<3",
+  "pwdlib[argon2]>=0.2,<1",
+  "PyJWT>=2.9,<3",
+  "redis>=5.2,<6",
+  "sqlalchemy>=2.0,<3",
+  "structlog>=24.4,<26",
+  "uvicorn[standard]>=0.32,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.27,<1",
+  "mypy>=1.13,<2",
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<7",
+  "ruff>=0.8,<1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["UP017", "UP045"]
+
+[tool.mypy]
+python_version = "3.11"
+plugins = ["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
+strict = true
+exclude = ["alembic"]
