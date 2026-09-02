@@ -34,3 +34,5 @@ logs/
 coverage/
 .coverage
 *.db
+*.egg-info/
+*.tsbuildinfo
