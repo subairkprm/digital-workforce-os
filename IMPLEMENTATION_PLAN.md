@@ -18,6 +18,14 @@ Create the secure platform foundation required before messaging and voice implem
 ## Exit condition
 A tenant owner can securely authenticate, create/manage workforce records within their tenant, and all critical mutations are authorized and audited.
 
+## Phase 1 reconciliation
+
+- Completed: DWCO-001 through DWCO-006
+- Open for implementation gaps: DWCO-007, DWCO-008, and DWCO-010
+- Open for external CI/account verification: DWCO-009
+- Next proposed boundary: `docs/implementation-contracts/DWCO-0.2-ADMIN-SECURITY-CODEX-CONTRACT.md`
+- The proposed DWCO 0.2 contract remains a draft until explicitly approved.
+
 ## Explicitly deferred
 - external voice/PSTN
 - WebRTC production calling
