@@ -80,3 +80,37 @@ class AuditOut(ORMModel):
     resource_id: str
     details: dict[str, object]
     created_at: datetime
+
+
+class RoleCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    permissions: list[str] = Field(default_factory=list, max_length=30)
+
+
+class RolePatch(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=80)
+    permissions: Optional[list[str]] = Field(default=None, max_length=30)
+
+
+class RoleOut(BaseModel):
+    id: str
+    name: str
+    permissions: list[str]
+
+
+class MembershipRoleUpdate(BaseModel):
+    role_ids: list[str] = Field(max_length=30)
+
+
+class MembershipOut(BaseModel):
+    id: str
+    user_id: str
+    role_ids: list[str]
+
+
+class SecurityEventOut(BaseModel):
+    id: str
+    category: str
+    outcome: str
+    metadata: dict[str, object]
+    created_at: datetime

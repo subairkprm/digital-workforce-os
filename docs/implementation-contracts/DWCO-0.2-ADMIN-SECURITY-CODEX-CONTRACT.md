@@ -2,9 +2,9 @@
 
 ## Status
 
-DRAFT_FOR_REVIEW
+AUTHORIZED_FOR_LOCAL_AND_BRANCH_IMPLEMENTATION
 
-IMPLEMENTATION_NOT_AUTHORIZED
+AUTHORIZED_BY_USER=2026-09-03
 
 PRODUCTION_DEPLOYMENT_NOT_AUTHORIZED
 
@@ -21,7 +21,7 @@ must not represent remote CI as passing when no run exists.
 
 - PRs #11, #12, and #13 remain merged into `main`.
 - The Phase-1 completion report remains the evidence baseline.
-- No implementation begins until this draft is explicitly approved.
+- Implementation was explicitly approved on 2026-09-03.
 - Work starts from the then-current `main` on a bounded feature branch.
 
 ## In scope

@@ -5,6 +5,7 @@ os.environ["DWCO_REDIS_URL"] = "redis://localhost:6379/15"
 os.environ["DWCO_JWT_SECRET"] = "test-secret-that-is-long-and-never-production"
 
 import pytest
+import redis
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -17,6 +18,14 @@ from app.security import hash_password
 
 engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
 TestingSession = sessionmaker(bind=engine, expire_on_commit=False)
+
+
+@pytest.fixture(autouse=True)
+def unavailable_rate_limit_redis(monkeypatch: pytest.MonkeyPatch) -> None:
+    def unavailable(*args: object, **kwargs: object) -> None:
+        raise redis.ConnectionError("test Redis unavailable")
+
+    monkeypatch.setattr("app.rate_limit.redis.from_url", unavailable)
 
 
 @pytest.fixture
@@ -39,6 +48,7 @@ def seeded(db: Session) -> dict[str, object]:
         "department.manage",
         "role.manage",
         "audit.read",
+        "security.read",
     ]
     permissions = [Permission(code=code) for code in permission_codes]
     tenant_a, tenant_b = Tenant(slug="alpha", name="Alpha"), Tenant(slug="beta", name="Beta")
@@ -54,7 +64,16 @@ def seeded(db: Session) -> dict[str, object]:
     member_b = Membership(tenant_id=tenant_b.id, user_id=owner.id, roles=[role_b])
     db.add_all([role_owner, role_viewer, role_b, member_owner, member_viewer, member_b])
     db.commit()
-    return {"tenant_a": tenant_a, "tenant_b": tenant_b, "owner": owner, "viewer": viewer}
+    return {
+        "tenant_a": tenant_a,
+        "tenant_b": tenant_b,
+        "owner": owner,
+        "viewer": viewer,
+        "member_owner": member_owner,
+        "member_viewer": member_viewer,
+        "member_b": member_b,
+        "role_owner": role_owner,
+    }
 
 
 @pytest.fixture
