@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Membership, User
 from app.security import decode_access_token
+from app.security_events import record_security_event
 
 bearer = HTTPBearer(auto_error=False)
 Db = Annotated[Session, Depends(get_db)]
@@ -72,9 +73,18 @@ def request_context(
 Context = Annotated[RequestContext, Depends(request_context)]
 
 
-def require_permission(code: str) -> Callable[[RequestContext], RequestContext]:
-    def dependency(context: Context) -> RequestContext:
+def require_permission(code: str) -> Callable[..., RequestContext]:
+    def dependency(db: Db, context: Context) -> RequestContext:
         if code not in context.permissions and "tenant.owner" not in context.permissions:
+            record_security_event(
+                db,
+                "authorization.denied",
+                "denied",
+                tenant_id=context.tenant_id,
+                actor_user_id=context.user.id,
+                metadata={"permission": code},
+            )
+            db.commit()
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="permission denied")
         return context
 

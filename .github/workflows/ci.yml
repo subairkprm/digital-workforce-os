@@ -37,6 +37,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - run: python -m pip install --upgrade pip
       - run: pip install -e '.[dev]'
       - run: ruff check .
       - run: ruff format --check .
@@ -61,6 +62,7 @@ jobs:
           cache-dependency-path: admin-web/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm run typecheck
+      - run: pnpm run test
       - run: pnpm run build
       - run: pnpm audit --audit-level high
 

@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     access_token_minutes: int = 15
     refresh_token_days: int = 30
     cors_origins: list[str] = ["http://localhost:3000"]
+    auth_rate_limit: int = 10
+    mutation_rate_limit: int = 120
+    rate_limit_window_seconds: int = 60
 
 
 @lru_cache

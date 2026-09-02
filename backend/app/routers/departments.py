@@ -5,9 +5,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.audit import record_audit
+from app.config import get_settings
 from app.database import get_db
 from app.dependencies import RequestContext, require_permission
 from app.models import Department
+from app.rate_limit import enforce_rate_limit
 from app.schemas import DepartmentCreate, DepartmentOut, DepartmentPatch
 
 router = APIRouter(prefix="/departments", tags=["departments"])
@@ -27,6 +29,11 @@ def create_department(
     db: Annotated[Session, Depends(get_db)],
     context: Annotated[RequestContext, Depends(require_permission("department.manage"))],
 ) -> Department:
+    enforce_rate_limit(
+        "tenant-mutation",
+        f"{context.tenant_id}:{context.user.id}",
+        get_settings().mutation_rate_limit,
+    )
     department = Department(tenant_id=context.tenant_id, **payload.model_dump())
     db.add(department)
     db.flush()
@@ -43,6 +50,11 @@ def update_department(
     db: Annotated[Session, Depends(get_db)],
     context: Annotated[RequestContext, Depends(require_permission("department.manage"))],
 ) -> Department:
+    enforce_rate_limit(
+        "tenant-mutation",
+        f"{context.tenant_id}:{context.user.id}",
+        get_settings().mutation_rate_limit,
+    )
     department = db.scalar(
         select(Department).where(
             Department.id == department_id, Department.tenant_id == context.tenant_id

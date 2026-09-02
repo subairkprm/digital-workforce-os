@@ -7,9 +7,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.audit import record_audit
+from app.config import get_settings
 from app.database import get_db
 from app.dependencies import RequestContext, require_permission
 from app.models import Department, Employee
+from app.rate_limit import enforce_rate_limit
 from app.schemas import EmployeeCreate, EmployeeOut, EmployeePatch
 
 router = APIRouter(prefix="/employees", tags=["employees"])
@@ -33,6 +35,11 @@ def create_employee(
     db: Annotated[Session, Depends(get_db)],
     context: Annotated[RequestContext, Depends(require_permission("employee.create"))],
 ) -> Employee:
+    enforce_rate_limit(
+        "tenant-mutation",
+        f"{context.tenant_id}:{context.user.id}",
+        get_settings().mutation_rate_limit,
+    )
     if not _department_valid(db, context.tenant_id, payload.department_id):
         raise HTTPException(status_code=422, detail="invalid department")
     employee = Employee(tenant_id=context.tenant_id, **payload.model_dump())
@@ -73,6 +80,11 @@ def update_employee(
     db: Annotated[Session, Depends(get_db)],
     context: Annotated[RequestContext, Depends(require_permission("employee.update"))],
 ) -> Employee:
+    enforce_rate_limit(
+        "tenant-mutation",
+        f"{context.tenant_id}:{context.user.id}",
+        get_settings().mutation_rate_limit,
+    )
     employee = db.scalar(
         select(Employee).where(Employee.id == employee_id, Employee.tenant_id == context.tenant_id)
     )
@@ -99,6 +111,11 @@ def suspend_employee(
     db: Annotated[Session, Depends(get_db)],
     context: Annotated[RequestContext, Depends(require_permission("employee.suspend"))],
 ) -> Employee:
+    enforce_rate_limit(
+        "tenant-mutation",
+        f"{context.tenant_id}:{context.user.id}",
+        get_settings().mutation_rate_limit,
+    )
     employee = db.scalar(
         select(Employee).where(Employee.id == employee_id, Employee.tenant_id == context.tenant_id)
     )

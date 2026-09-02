@@ -16,6 +16,7 @@ PERMISSIONS = [
     "department.manage",
     "role.manage",
     "audit.read",
+    "security.read",
 ]
 
 

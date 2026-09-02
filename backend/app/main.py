@@ -8,7 +8,7 @@ from sqlalchemy import text
 
 from app.config import get_settings
 from app.database import engine
-from app.routers import audit, auth, departments, employees
+from app.routers import audit, auth, departments, employees, roles, security_events
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 structlog.configure(
@@ -20,13 +20,15 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=get_settings().cors_origins,
     allow_credentials=False,
-    allow_methods=["GET", "POST", "PATCH"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
     allow_headers=["Authorization", "Content-Type", "X-Tenant-ID"],
 )
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(employees.router, prefix="/api/v1")
 app.include_router(departments.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
+app.include_router(roles.router, prefix="/api/v1")
+app.include_router(security_events.router, prefix="/api/v1")
 
 
 @app.get("/health")
