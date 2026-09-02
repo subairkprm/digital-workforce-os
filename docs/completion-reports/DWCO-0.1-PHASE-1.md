@@ -20,15 +20,16 @@ SECURITY_CONTROLS=Argon2 password hashing; signed short-lived access tokens; SHA
 rotating refresh sessions with family reuse revocation; membership-derived tenant context; RBAC;
 tenant predicates on all workforce queries; server-only audit creation; restricted local CORS
 
-TEST_RESULTS=Ruff PASS; mypy PASS; pytest 7 PASS; migration upgrade/downgrade PASS; git diff check
-PASS
+TEST_RESULTS=Ruff PASS; mypy PASS; pytest 7 PASS on Python 3.12 with 88% coverage; migration
+upgrade/downgrade PASS; admin TypeScript PASS; mobile TypeScript and Expo dependency check PASS; git
+diff check PASS; Python, admin and mobile dependency audits PASS with no known vulnerabilities
 
-BUILD_RESULTS=Python syntax and backend gates PASS. Admin/mobile typecheck and build deferred to
-remote CI because Node.js is not installed locally. Docker startup deferred because Docker is not
-installed locally.
+BUILD_RESULTS=Backend editable package install PASS; Next.js 16 production build PASS; Docker
+Compose configuration and image build PASS; PostgreSQL 17, Redis 7 and API startup PASS; migration
+0001_phase1 applied; /health, /livez and /readyz returned HTTP 200; Redis returned PONG
 
-KNOWN_GAPS=Remote CI has not run; local machine lacks Node.js and Docker; shells are intentionally
-foundation-level and do not include full product workflows
+KNOWN_GAPS=GitHub Actions could not start because of account billing/spending limits; shells are
+intentionally foundation-level and do not include full product workflows
 
 DEFERRED_SCOPE=PSTN, SIP, production WebRTC calling, coturn, eSIM, carrier APIs, call recording,
 billing, AI, Teams and production deployment
