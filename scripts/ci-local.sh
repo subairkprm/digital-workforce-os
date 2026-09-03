@@ -8,6 +8,9 @@ elif [ -x /Users/subair/.local/bin/node ]; then node_cmd=/Users/subair/.local/bi
 else echo "Node.js is required"; exit 1
 fi
 PATH=$(dirname "$node_cmd"):$PATH
+if [ -d /Applications/Docker.app/Contents/Resources/bin ]; then
+  PATH=/Applications/Docker.app/Contents/Resources/bin:$PATH
+fi
 export PATH
 if [ -n "${PYTHON_BIN:-}" ]; then python_cmd=$PYTHON_BIN
 elif [ -x /Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 ]; then python_cmd=/Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3
