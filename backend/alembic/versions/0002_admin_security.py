@@ -4,6 +4,7 @@ Revision ID: 0002_admin_security
 """
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision = "0002_admin_security"
