@@ -47,3 +47,12 @@ before production deployment.
 Invitation secrets are high-entropy, expire within 30 days, are single-use, and are stored only as
 SHA-256 digests. The raw token is returned once for out-of-band local delivery. Production email or
 SMS delivery requires a separate provider-adapter and deployment contract.
+
+## Workforce presence
+
+Presence identity and tenant scope are derived exclusively from the authenticated membership.
+Clients can update only their own status, while directory presence requires `employee.read` (or
+`tenant.owner`). Heartbeats expire after 120 seconds and are reported as offline after expiry.
+Presence mutations are rate-limited and intentionally excluded from administrative audit events to
+avoid storing high-volume activity trails. Production retention, realtime transport, and analytics
+require separate authorization and privacy review.

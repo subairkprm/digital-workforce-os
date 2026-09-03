@@ -4,6 +4,8 @@ const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export type CurrentUser = { id: string; email: string; tenant_id: string; permissions: string[] };
 export type Employee = { id: string; employee_number: string; full_name: string; work_email: string; title?: string; is_suspended: boolean };
+export type PresenceStatus = "available" | "away" | "busy" | "offline";
+export type Presence = { employee_id?: string; employee_name?: string; status: PresenceStatus; last_seen_at?: string; expires_at?: string };
 type TokenPair = { access_token: string; refresh_token: string };
 
 async function errorFor(response: Response): Promise<Error> {

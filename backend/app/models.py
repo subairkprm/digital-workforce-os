@@ -7,6 +7,7 @@ from typing import Optional
 from sqlalchemy import (
     JSON,
     Boolean,
+    CheckConstraint,
     Column,
     DateTime,
     ForeignKey,
@@ -130,6 +131,25 @@ class Employee(TimestampMixin, Base):
     work_email: Mapped[str] = mapped_column(String(320))
     title: Mapped[Optional[str]] = mapped_column(String(160))
     is_suspended: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class Presence(TimestampMixin, Base):
+    __tablename__ = "presences"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "user_id"),
+        CheckConstraint(
+            "status IN ('available', 'away', 'busy', 'offline')",
+            name="ck_presences_status",
+        ),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_str)
+    tenant_id: Mapped[str] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    status: Mapped[str] = mapped_column(String(20), default="offline", index=True)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, index=True
+    )
 
 
 class RefreshSession(Base):

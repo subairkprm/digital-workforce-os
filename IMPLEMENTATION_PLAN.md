@@ -24,8 +24,7 @@ A tenant owner can securely authenticate, create/manage workforce records within
 - Open for implementation gaps: DWCO-007, DWCO-008, and DWCO-010
 - Open for external CI/account verification: DWCO-009
 - Temporary local enforcement: `docs/LOCAL_CI_FALLBACK.md`
-- Next proposed boundary: `docs/implementation-contracts/DWCO-0.2-ADMIN-SECURITY-CODEX-CONTRACT.md`
-- The proposed DWCO 0.2 contract remains a draft until explicitly approved.
+- Completed follow-up boundaries: DWCO 0.2 admin security and DWCO 0.3 workforce operations
 
 ## DWCO 0.3 workforce operations
 
@@ -34,6 +33,13 @@ department-manager assignment, bounded workforce search/pagination, and user-own
 revocation. The closure also makes invitation acceptance and role assignment usable in the web app
 and replaces the mobile placeholder with authenticated profile and directory workflows. External
 delivery providers and production deployment remain deferred.
+
+## DWCO 0.4 presence
+
+The bounded presence contract adds tenant-derived self-service status, heartbeat expiry, directory
+visibility, admin read access, and mobile presence controls. It intentionally uses polling and local
+API semantics; production realtime transport, messaging, and communications remain separate future
+contracts.
 
 ## Explicitly deferred
 - external voice/PSTN

@@ -33,8 +33,25 @@ describe("AdminShell", () => {
     await waitFor(() => expect(screen.getByRole("navigation", { name: "Administration" })).toBeInTheDocument());
     expect(screen.getByRole("button", { name: "Employees" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Departments" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Presence" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Roles" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Audit" })).not.toBeInTheDocument();
+  });
+
+  it("shows tenant presence records to directory readers", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ access_token: "access", refresh_token: "refresh" }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ email: "viewer@example.com", tenant_id: "tenant-a", permissions: ["employee.read"] }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ([{ employee_id: "employee-1", employee_name: "Alice", status: "available", last_seen_at: "2026-09-03T12:00:00Z" }]) });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AdminShell />);
+    fireEvent.change(screen.getByLabelText("Tenant ID"), { target: { value: "tenant-a" } });
+    fireEvent.change(screen.getByLabelText("Work email"), { target: { value: "viewer@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct-password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Presence" }));
+    expect(await screen.findByText("Alice")).toBeInTheDocument();
+    expect(screen.getByText(/available/)).toBeInTheDocument();
   });
 
   it("shows workforce operations only when authorized", async () => {

@@ -99,7 +99,7 @@ until curl --silent --show-error --fail http://localhost:8000/readyz >/dev/null;
 done
 curl --silent --show-error --fail http://localhost:8000/health >/dev/null
 curl --silent --show-error --fail http://localhost:8000/livez >/dev/null
-test "$("$docker_cmd" compose exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0003_workforce_operations"
+test "$("$docker_cmd" compose exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0004_presence"
 test "$("$docker_cmd" compose exec -T redis redis-cli ping)" = "PONG"
 
 echo "LOCAL_CI=PASS"
