@@ -4,6 +4,14 @@ set -eu
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 ci_venv="$repo_dir/backend/.ci-venv"
 
+if [ -n "${NODE_BIN:-}" ]; then node_cmd=$NODE_BIN
+elif command -v node >/dev/null 2>&1; then node_cmd=$(command -v node)
+elif [ -x /Users/subair/.local/bin/node ]; then node_cmd=/Users/subair/.local/bin/node
+else echo "Node.js is required"; exit 1
+fi
+PATH=$(dirname "$node_cmd"):$PATH
+export PATH
+
 if [ -n "${PNPM_BIN:-}" ]; then
   pnpm_cmd=$PNPM_BIN
 elif command -v pnpm >/dev/null 2>&1; then

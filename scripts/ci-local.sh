@@ -2,6 +2,13 @@
 set -eu
 
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ -n "${NODE_BIN:-}" ]; then node_cmd=$NODE_BIN
+elif command -v node >/dev/null 2>&1; then node_cmd=$(command -v node)
+elif [ -x /Users/subair/.local/bin/node ]; then node_cmd=/Users/subair/.local/bin/node
+else echo "Node.js is required"; exit 1
+fi
+PATH=$(dirname "$node_cmd"):$PATH
+export PATH
 if [ -n "${PYTHON_BIN:-}" ]; then python_cmd=$PYTHON_BIN
 elif [ -x /Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 ]; then python_cmd=/Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3
 else python_cmd=python3

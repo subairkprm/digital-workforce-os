@@ -24,7 +24,8 @@ make ci-local
 The gate uses an isolated cached Python environment and runs backend lint, formatting, typing,
 tests, coverage and dependency audit; Alembic upgrade/downgrade; admin tests and production build;
 mobile checks; workflow and secret validation; and Docker startup with PostgreSQL, Redis, migration
-and readiness verification.
+and readiness verification. The scripts resolve their required runtimes explicitly so they also work
+inside GitHub Desktop's restricted process environment.
 
 ## Enable the pre-push gate
 
