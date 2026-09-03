@@ -41,3 +41,9 @@ contain passwords, raw access/refresh tokens, or foreign-tenant resource identif
 are readable only with `security.read`; platform-level events with no tenant are not exposed through
 the tenant API. Retention is not automated in DWCO 0.2; review and deletion policy must be defined
 before production deployment.
+
+## Workforce invitations
+
+Invitation secrets are high-entropy, expire within 30 days, are single-use, and are stored only as
+SHA-256 digests. The raw token is returned once for out-of-band local delivery. Production email or
+SMS delivery requires a separate provider-adapter and deployment contract.

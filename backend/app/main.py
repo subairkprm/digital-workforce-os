@@ -8,14 +8,14 @@ from sqlalchemy import text
 
 from app.config import get_settings
 from app.database import engine
-from app.routers import audit, auth, departments, employees, roles, security_events
+from app.routers import audit, auth, departments, employees, invitations, roles, security_events
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 structlog.configure(
     processors=[structlog.processors.TimeStamper(fmt="iso"), structlog.processors.JSONRenderer()]
 )
 
-app = FastAPI(title="DWCO API", version="0.1.0")
+app = FastAPI(title="DWCO API", version="0.3.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_settings().cors_origins,
@@ -29,6 +29,7 @@ app.include_router(departments.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
 app.include_router(roles.router, prefix="/api/v1")
 app.include_router(security_events.router, prefix="/api/v1")
+app.include_router(invitations.router, prefix="/api/v1")
 
 
 @app.get("/health")

@@ -1,14 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.audit import record_audit
 from app.config import get_settings
 from app.database import get_db
 from app.dependencies import RequestContext, require_permission
-from app.models import Department
+from app.models import Department, Employee
 from app.rate_limit import enforce_rate_limit
 from app.schemas import DepartmentCreate, DepartmentOut, DepartmentPatch
 
@@ -19,8 +19,18 @@ router = APIRouter(prefix="/departments", tags=["departments"])
 def list_departments(
     db: Annotated[Session, Depends(get_db)],
     context: Annotated[RequestContext, Depends(require_permission("employee.read"))],
+    q: Annotated[str | None, Query(max_length=160)] = None,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> list[Department]:
-    return list(db.scalars(select(Department).where(Department.tenant_id == context.tenant_id)))
+    query = select(Department).where(Department.tenant_id == context.tenant_id)
+    if q:
+        pattern = f"%{q.strip()}%"
+        query = query.where(
+            or_(Department.name.ilike(pattern), Department.description.ilike(pattern))
+        )
+    query = query.order_by(Department.name, Department.id).offset(offset).limit(limit)
+    return list(db.scalars(query))
 
 
 @router.post("", response_model=DepartmentOut, status_code=status.HTTP_201_CREATED)
@@ -63,6 +73,17 @@ def update_department(
     if department is None:
         raise HTTPException(status_code=404, detail="department not found")
     changes = payload.model_dump(exclude_unset=True)
+    manager_id = changes.get("manager_employee_id")
+    if (
+        manager_id is not None
+        and db.scalar(
+            select(Employee.id).where(
+                Employee.id == manager_id, Employee.tenant_id == context.tenant_id
+            )
+        )
+        is None
+    ):
+        raise HTTPException(status_code=422, detail="invalid manager employee")
     for field, value in changes.items():
         setattr(department, field, value)
     record_audit(

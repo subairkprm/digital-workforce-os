@@ -36,4 +36,19 @@ describe("AdminShell", () => {
     expect(screen.queryByRole("button", { name: "Roles" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Audit" })).not.toBeInTheDocument();
   });
+
+  it("shows workforce operations only when authorized", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ access_token: "access", refresh_token: "refresh" }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ email: "admin@example.com", tenant_id: "tenant-a", permissions: ["membership.manage"] }) });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AdminShell />);
+    fireEvent.change(screen.getByLabelText("Tenant ID"), { target: { value: "tenant-a" } });
+    fireEvent.change(screen.getByLabelText("Work email"), { target: { value: "admin@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct-password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Invitations" })).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "Sessions" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Employees" })).not.toBeInTheDocument();
+  });
 });

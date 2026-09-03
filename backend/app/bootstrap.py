@@ -17,6 +17,7 @@ PERMISSIONS = [
     "role.manage",
     "audit.read",
     "security.read",
+    "membership.manage",
 ]
 
 
