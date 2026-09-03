@@ -18,11 +18,11 @@ administrative mutations; rate-limited invitation acceptance
 TESTS=19 backend Phase 1-3 regression/adversarial tests and 6 admin component tests PASS;
 cross-tenant role, manager, profile, invitation, and session denial tests included
 
-BUILD_RESULT=LOCAL_CI_FAST=PASS after closure updates; prior LOCAL_CI and DOCKER_CI passed migration
-0003, PostgreSQL, Redis, health/live/readiness; final admin build/audits and mobile checks PASS
+BUILD_RESULT=LOCAL_CI_FAST=PASS; LOCAL_CI=PASS; DOCKER_CI=PASS; migration 0003,
+PostgreSQL, Redis, health/live/readiness, admin production build/audits, and mobile checks PASS
 
-KNOWN_ISSUES=GitHub Actions remains account billing-locked; Docker Desktop engine stopped after the
-successful Docker gate and requires local restart before repeating container verification
+KNOWN_ISSUES=GitHub Actions remains account billing-locked; the enforced local pre-commit and
+pre-push quality gates remain the active CI fallback
 
 DEFERRED_SCOPE=Email/SMS delivery, password-reset delivery, PSTN, WebRTC production calling, eSIM,
 carrier APIs, billing, AI, Teams, recording, and production deployment
