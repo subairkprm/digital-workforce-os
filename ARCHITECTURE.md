@@ -40,6 +40,7 @@ Tenant identity must be derived from authenticated server-side context, never tr
 - membership
 - employee
 - department
+- presence
 - role
 - permission
 - extension

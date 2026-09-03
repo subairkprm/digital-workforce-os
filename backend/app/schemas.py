@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -73,6 +73,26 @@ class EmployeeOut(ORMModel):
     title: Optional[str]
     department_id: Optional[str]
     is_suspended: bool
+
+
+PresenceStatus = Literal["available", "away", "busy", "offline"]
+ActivePresenceStatus = Literal["available", "away", "busy"]
+
+
+class PresenceUpdate(BaseModel):
+    status: PresenceStatus
+
+
+class PresenceHeartbeat(BaseModel):
+    status: Optional[ActivePresenceStatus] = None
+
+
+class PresenceOut(BaseModel):
+    employee_id: Optional[str]
+    employee_name: Optional[str]
+    status: PresenceStatus
+    last_seen_at: Optional[datetime]
+    expires_at: Optional[datetime]
 
 
 class AuditOut(ORMModel):
