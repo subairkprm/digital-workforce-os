@@ -1,52 +1,56 @@
-# DWCO 0.1 — Foundation Implementation Plan
+# DWCO implementation plan
 
-## Objective
-Create the secure platform foundation required before messaging and voice implementation.
+`MASTER_PROJECT_PLAN.md` is the product and stage authority. `PROJECT_STATUS.md` is the current
+status authority. This file preserves the implementation-epic view and must not override either.
 
-## Epics
-- DWCO-001 Repository/Foundation
-- DWCO-002 Local Development Environment
-- DWCO-003 PostgreSQL Foundation
-- DWCO-004 Tenant Architecture
-- DWCO-005 Authentication
-- DWCO-006 RBAC
-- DWCO-007 Audit Events
-- DWCO-008 Admin Shell
-- DWCO-009 CI Pipeline
-- DWCO-010 Security Baseline
+## Foundation epics
 
-## Exit condition
-A tenant owner can securely authenticate, create/manage workforce records within their tenant, and all critical mutations are authorized and audited.
+| Epic | Outcome | Status | Evidence |
+|---|---|---|---|
+| DWCO-001 | Repository/foundation | Complete | DWCO 0.1 completion report |
+| DWCO-002 | Local development environment | Complete | DWCO 0.1 completion report |
+| DWCO-003 | PostgreSQL foundation | Complete | Migration `0001_phase1` |
+| DWCO-004 | Tenant architecture | Complete | DWCO 0.1 tests and report |
+| DWCO-005 | Authentication | Complete | DWCO 0.1 tests and report |
+| DWCO-006 | RBAC | Complete | DWCO 0.1/0.2 tests and reports |
+| DWCO-007 | Audit events | Complete | DWCO 0.1/0.2 implementation and reports |
+| DWCO-008 | Admin shell | Complete | DWCO 0.1/0.2 implementation and reports |
+| DWCO-009 | Remote CI authority | Blocked externally | GitHub Actions startup failure; local fallback active |
+| DWCO-010 | Security baseline | Complete | `SECURITY.md` and DWCO 0.2 report |
 
-## Phase 1 reconciliation
+The former statement that DWCO-007, DWCO-008, and DWCO-010 were open implementation gaps was
+stale and is superseded by merged implementation evidence. DWCO-009 remains unresolved: local
+quality gates are passing evidence, but they are not GitHub-attested CI.
 
-- Completed: DWCO-001 through DWCO-006
-- Open for implementation gaps: DWCO-007, DWCO-008, and DWCO-010
-- Open for external CI/account verification: DWCO-009
-- Temporary local enforcement: `docs/LOCAL_CI_FALLBACK.md`
-- Completed follow-up boundaries: DWCO 0.2 admin security and DWCO 0.3 workforce operations
+## Accepted stages
 
-## DWCO 0.3 workforce operations
+- DWCO 0.1 foundation: complete.
+- DWCO 0.2 admin and security: complete.
+- DWCO 0.3 workforce operations: complete.
 
-The bounded workforce-operations contract adds tenant invitations, employee reactivation,
-department-manager assignment, bounded workforce search/pagination, and user-owned refresh-session
-revocation. The closure also makes invitation acceptance and role assignment usable in the web app
-and replaces the mobile placeholder with authenticated profile and directory workflows. External
-delivery providers and production deployment remain deferred.
+These three accepted stages contribute 34 percentage points under
+`docs/roadmap/COMPLETION_MODEL.md`.
 
-## DWCO 0.4 presence
+## Next approval boundary: DWCO 0.4
 
-The bounded presence contract adds tenant-derived self-service status, heartbeat expiry, directory
-visibility, admin read access, and mobile presence controls. It intentionally uses polling and local
-API semantics; production realtime transport, messaging, and communications remain separate future
-contracts.
+The next planned stage is realtime communication. A narrow presence contract has already been
+implemented and merged, including polling-based status, heartbeat expiry, admin visibility, and
+mobile controls. That capability is valid prerequisite evidence, not approval of production
+realtime transport or the complete DWCO 0.4 stage.
 
-## Explicitly deferred
-- external voice/PSTN
-- WebRTC production calling
-- eSIM/carrier provisioning
-- call recording
-- AI
-- billing
-- CRM
-- production deployment
+The draft stage contract is
+`docs/implementation-contracts/DWCO-0.4-REALTIME-COMMUNICATION-CONTRACT.md`. Implementation must not
+start until its approval gate is recorded. WebSocket/SSE transport, durable messaging, push,
+retention, abuse controls, and operational readiness remain unapproved.
+
+## Later boundaries
+
+- App-to-app voice/WebRTC and coturn.
+- Authorised-provider PSTN, SIP, and PBX.
+- Mobility/eSIM and carrier integration.
+- CRM and other integrations.
+- AI communication intelligence.
+- Billing and payments.
+- Production infrastructure and deployment.
+
+No later boundary is authorized by this plan.
