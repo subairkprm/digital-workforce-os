@@ -86,8 +86,8 @@ fi
 
 echo "[7/7] Docker build, migration and live readiness"
 "$docker_cmd" compose config --quiet
-"$docker_cmd" compose up -d --build
 compose_started=1
+"$docker_cmd" compose up -d --build
 attempt=0
 until curl --silent --show-error --fail http://localhost:8000/readyz >/dev/null; do
   attempt=$((attempt + 1))
