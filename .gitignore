@@ -36,3 +36,4 @@ coverage/
 *.db
 *.egg-info/
 *.tsbuildinfo
+backend/.ci-venv/
