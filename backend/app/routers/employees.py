@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.audit import record_audit
 from app.config import get_settings
 from app.database import get_db
-from app.dependencies import RequestContext, require_permission
+from app.dependencies import Context, RequestContext, require_permission
 from app.models import Department, Employee, Membership
 from app.rate_limit import enforce_rate_limit
 from app.schemas import EmployeeCreate, EmployeeOut, EmployeePatch
@@ -74,6 +74,22 @@ def list_employees(
         query = query.where(Employee.is_suspended.is_(suspended))
     query = query.order_by(Employee.full_name, Employee.id).offset(offset).limit(limit)
     return list(db.scalars(query))
+
+
+@router.get("/me", response_model=EmployeeOut)
+def get_my_employee_profile(
+    db: Annotated[Session, Depends(get_db)],
+    context: Context,
+) -> Employee:
+    employee = db.scalar(
+        select(Employee).where(
+            Employee.user_id == context.user.id,
+            Employee.tenant_id == context.tenant_id,
+        )
+    )
+    if employee is None:
+        raise HTTPException(status_code=404, detail="employee profile not found")
+    return employee
 
 
 @router.get("/{employee_id}", response_model=EmployeeOut)

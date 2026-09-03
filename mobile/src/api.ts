@@ -1,0 +1,52 @@
+import { secureTokenStore, StoredSession } from "./tokenStore";
+
+const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000";
+
+export type CurrentUser = { id: string; email: string; tenant_id: string; permissions: string[] };
+export type Employee = { id: string; employee_number: string; full_name: string; work_email: string; title?: string; is_suspended: boolean };
+type TokenPair = { access_token: string; refresh_token: string };
+
+async function errorFor(response: Response): Promise<Error> {
+  if (response.status === 401) return new Error("Your session has expired.");
+  if (response.status === 403) return new Error("You do not have permission for this action.");
+  if (response.status === 404) return new Error("The requested record was not found.");
+  return new Error("The server could not complete the request.");
+}
+
+async function refresh(session: StoredSession): Promise<StoredSession> {
+  const response = await fetch(`${apiUrl}/api/v1/auth/refresh`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: session.refreshToken }) });
+  if (!response.ok) throw await errorFor(response);
+  const tokens = await response.json() as TokenPair;
+  const rotated = { accessToken: tokens.access_token, refreshToken: tokens.refresh_token, tenantId: session.tenantId };
+  await secureTokenStore.save(rotated);
+  return rotated;
+}
+
+export async function request<T>(path: string, session: StoredSession, init?: RequestInit): Promise<{data: T; session: StoredSession}> {
+  const execute = (active: StoredSession) => fetch(`${apiUrl}/api/v1${path}`, { ...init, headers: { "Content-Type": "application/json", Authorization: `Bearer ${active.accessToken}`, "X-Tenant-ID": active.tenantId, ...init?.headers } });
+  let active = session;
+  let response = await execute(active);
+  if (response.status === 401) { active = await refresh(active); response = await execute(active); }
+  if (!response.ok) throw await errorFor(response);
+  return { data: await response.json() as T, session: active };
+}
+
+export async function signIn(tenantId: string, email: string, password: string): Promise<{user: CurrentUser; session: StoredSession}> {
+  const response = await fetch(`${apiUrl}/api/v1/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+  if (!response.ok) throw new Error("Sign-in failed. Check your credentials.");
+  const tokens = await response.json() as TokenPair;
+  const session = { accessToken: tokens.access_token, refreshToken: tokens.refresh_token, tenantId };
+  try {
+    const profile = await request<CurrentUser>("/auth/me", session);
+    await secureTokenStore.save(profile.session);
+    return { user: profile.data, session: profile.session };
+  } catch (reason) {
+    await signOut(session);
+    throw reason;
+  }
+}
+
+export async function signOut(session: StoredSession): Promise<void> {
+  await fetch(`${apiUrl}/api/v1/auth/logout`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.accessToken}` }, body: JSON.stringify({ refresh_token: session.refreshToken }) }).catch(() => undefined);
+  await secureTokenStore.clear();
+}

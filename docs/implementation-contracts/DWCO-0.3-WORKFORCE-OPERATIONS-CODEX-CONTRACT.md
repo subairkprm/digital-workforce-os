@@ -15,6 +15,8 @@ foundation without introducing production communications or deployment dependenc
 - Search, status filters, bounded pagination, and deterministic ordering for employee/department APIs.
 - Authenticated users can list and revoke their own refresh sessions.
 - Admin workflows for invitations, employee lifecycle, search, and department managers.
+- Public web invitation-acceptance workflow and tenant-safe invitation-role selection.
+- Functional mobile login, secure token persistence, own-profile view, and permitted directory.
 - Migration, cross-tenant, token-reuse, authorization, audit, and regression tests.
 
 ## Security invariants
