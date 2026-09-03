@@ -14,7 +14,7 @@ from app.database import get_db
 from app.dependencies import RequestContext, require_permission
 from app.models import AuditEvent, Employee, Invitation, Membership, Role, User
 from app.rate_limit import enforce_rate_limit
-from app.schemas import InvitationAccept, InvitationCreate, InvitationOut
+from app.schemas import InvitationAccept, InvitationCreate, InvitationOut, RoleOut
 from app.security import digest_token, hash_password
 
 router = APIRouter(prefix="/invitations", tags=["invitations"])
@@ -45,6 +45,24 @@ def list_invitations(
         .limit(100)
     )
     return [invitation_out(invitation) for invitation in invitations]
+
+
+@router.get("/available-roles", response_model=list[RoleOut])
+def available_invitation_roles(
+    db: Annotated[Session, Depends(get_db)],
+    context: Annotated[RequestContext, Depends(require_permission("membership.manage"))],
+) -> list[RoleOut]:
+    roles = db.scalars(
+        select(Role).where(Role.tenant_id == context.tenant_id).order_by(Role.name, Role.id)
+    )
+    return [
+        RoleOut(
+            id=role.id,
+            name=role.name,
+            permissions=sorted(permission.code for permission in role.permissions),
+        )
+        for role in roles
+    ]
 
 
 @router.post("", response_model=InvitationOut, status_code=status.HTTP_201_CREATED)

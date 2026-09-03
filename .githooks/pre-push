@@ -2,4 +2,46 @@
 set -eu
 
 repo_dir=$(git rev-parse --show-toplevel)
-exec "$repo_dir/scripts/ci-local.sh"
+lock_dir=$(git rev-parse --git-path dwco-pre-push.lock)
+pass_file=$(git rev-parse --git-path dwco-pre-push.last-pass)
+head_sha=$(git rev-parse HEAD)
+lock_acquired=0
+
+cleanup() {
+  if [ "$lock_acquired" -eq 1 ]; then
+    rm -f "$lock_dir/pid"
+    rmdir "$lock_dir"
+  fi
+}
+trap cleanup EXIT INT TERM
+
+if mkdir "$lock_dir" 2>/dev/null; then
+  lock_acquired=1
+  printf '%s\n' "$$" > "$lock_dir/pid"
+else
+  echo "Another DWCO pre-push verification is already running; waiting for it to finish."
+  attempt=0
+  while [ -d "$lock_dir" ]; do
+    attempt=$((attempt + 1))
+    if [ "$attempt" -ge 300 ]; then
+      echo "Timed out waiting for the existing DWCO pre-push verification."
+      exit 1
+    fi
+    sleep 2
+  done
+
+  if [ -f "$pass_file" ] && [ "$(cat "$pass_file")" = "$head_sha" ]; then
+    echo "Reusing the successful DWCO verification for $head_sha."
+    exit 0
+  fi
+
+  echo "The concurrent DWCO verification did not pass for $head_sha."
+  exit 1
+fi
+
+if "$repo_dir/scripts/ci-local.sh"; then
+  printf '%s\n' "$head_sha" > "$pass_file"
+  exit 0
+fi
+
+exit 1

@@ -100,6 +100,18 @@ def test_invitation_rejects_cross_tenant_role_and_revoked_token(
     )
 
 
+def test_available_invitation_roles_are_tenant_scoped(
+    client: TestClient, seeded: dict[str, object]
+) -> None:
+    tenant_a = seeded["tenant_a"]
+    tokens = login(client)
+    response = client.get(
+        "/api/v1/invitations/available-roles", headers=headers(tokens, tenant_a.id)
+    )
+    assert response.status_code == 200
+    assert {role["name"] for role in response.json()} == {"Owner", "Viewer"}
+
+
 def test_session_list_and_revoke_are_user_scoped(
     client: TestClient, db: Session, seeded: dict[str, object]
 ) -> None:
@@ -198,6 +210,10 @@ def test_employee_lifecycle_controls_linked_tenant_membership(
     )
     db.add(employee)
     db.commit()
+    viewer_tokens = login(client, email="viewer@example.com")
+    profile = client.get("/api/v1/employees/me", headers=headers(viewer_tokens, tenant.id))
+    assert profile.status_code == 200
+    assert profile.json()["id"] == employee.id
     tokens = login(client)
     suspended = client.post(
         f"/api/v1/employees/{employee.id}/suspend", headers=headers(tokens, tenant.id)

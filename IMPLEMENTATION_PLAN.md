@@ -31,7 +31,9 @@ A tenant owner can securely authenticate, create/manage workforce records within
 
 The bounded workforce-operations contract adds tenant invitations, employee reactivation,
 department-manager assignment, bounded workforce search/pagination, and user-owned refresh-session
-revocation. External delivery providers and production deployment remain deferred.
+revocation. The closure also makes invitation acceptance and role assignment usable in the web app
+and replaces the mobile placeholder with authenticated profile and directory workflows. External
+delivery providers and production deployment remain deferred.
 
 ## Explicitly deferred
 - external voice/PSTN
