@@ -7,9 +7,9 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database import get_db
 from app.dependencies import Context, current_user
-from app.models import User
+from app.models import RefreshSession, User
 from app.rate_limit import enforce_rate_limit
-from app.schemas import CurrentUser, LoginRequest, RefreshRequest, TokenPair
+from app.schemas import CurrentUser, LoginRequest, RefreshRequest, SessionOut, TokenPair
 from app.security import (
     create_access_token,
     create_refresh_session,
@@ -92,3 +92,38 @@ def me(context: Context) -> CurrentUser:
         tenant_id=context.tenant_id,
         permissions=sorted(context.permissions),
     )
+
+
+@router.get("/sessions", response_model=list[SessionOut])
+def sessions(
+    db: Annotated[Session, Depends(get_db)],
+    user: Annotated[User, Depends(current_user)],
+) -> list[RefreshSession]:
+    return list(
+        db.scalars(
+            select(RefreshSession)
+            .where(RefreshSession.user_id == user.id)
+            .order_by(RefreshSession.created_at.desc())
+            .limit(100)
+        )
+    )
+
+
+@router.delete("/sessions/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+def revoke_session(
+    session_id: str,
+    db: Annotated[Session, Depends(get_db)],
+    user: Annotated[User, Depends(current_user)],
+) -> None:
+    session = db.scalar(
+        select(RefreshSession).where(
+            RefreshSession.id == session_id, RefreshSession.user_id == user.id
+        )
+    )
+    if session is None:
+        raise HTTPException(status_code=404, detail="session not found")
+    if session.revoked_at is None:
+        from datetime import datetime, timezone
+
+        session.revoked_at = datetime.now(timezone.utc)
+        db.commit()

@@ -49,6 +49,7 @@ def seeded(db: Session) -> dict[str, object]:
         "role.manage",
         "audit.read",
         "security.read",
+        "membership.manage",
     ]
     permissions = [Permission(code=code) for code in permission_codes]
     tenant_a, tenant_b = Tenant(slug="alpha", name="Alpha"), Tenant(slug="beta", name="Beta")
@@ -73,6 +74,7 @@ def seeded(db: Session) -> dict[str, object]:
         "member_viewer": member_viewer,
         "member_b": member_b,
         "role_owner": role_owner,
+        "role_b": role_b,
     }
 
 

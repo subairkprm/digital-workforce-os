@@ -111,6 +111,7 @@ class Department(TimestampMixin, Base):
     tenant_id: Mapped[str] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String(160))
     description: Mapped[Optional[str]] = mapped_column(String(500))
+    manager_employee_id: Mapped[Optional[str]] = mapped_column(String(36), index=True)
 
 
 class Employee(TimestampMixin, Base):
@@ -171,6 +172,25 @@ class SecurityEvent(Base):
     category: Mapped[str] = mapped_column(String(80), index=True)
     outcome: Mapped[str] = mapped_column(String(40))
     metadata_: Mapped[dict[str, object]] = mapped_column("metadata", JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, index=True
+    )
+
+
+class Invitation(Base):
+    __tablename__ = "invitations"
+    __table_args__ = (UniqueConstraint("tenant_id", "email", "accepted_at"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_str)
+    tenant_id: Mapped[str] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), index=True)
+    email: Mapped[str] = mapped_column(String(320), index=True)
+    token_digest: Mapped[str] = mapped_column(String(64), unique=True)
+    role_ids: Mapped[list[str]] = mapped_column(JSON, default=list)
+    invited_by_user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="RESTRICT"), index=True
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, index=True
     )

@@ -3,3 +3,7 @@ __pycache__
 .mypy_cache
 .ruff_cache
 tests
+.ci-venv
+.coverage
+*.egg-info
+test.db

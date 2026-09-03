@@ -40,12 +40,14 @@ class DepartmentCreate(BaseModel):
 class DepartmentPatch(BaseModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=160)
     description: Optional[str] = Field(default=None, max_length=500)
+    manager_employee_id: Optional[str] = None
 
 
 class DepartmentOut(ORMModel):
     id: str
     name: str
     description: Optional[str]
+    manager_employee_id: Optional[str]
 
 
 class EmployeeCreate(BaseModel):
@@ -114,3 +116,33 @@ class SecurityEventOut(BaseModel):
     outcome: str
     metadata: dict[str, object]
     created_at: datetime
+
+
+class InvitationCreate(BaseModel):
+    email: EmailStr
+    role_ids: list[str] = Field(default_factory=list, max_length=30)
+    expires_in_days: int = Field(default=7, ge=1, le=30)
+
+
+class InvitationOut(BaseModel):
+    id: str
+    email: EmailStr
+    role_ids: list[str]
+    expires_at: datetime
+    accepted_at: Optional[datetime]
+    revoked_at: Optional[datetime]
+    created_at: datetime
+    token: Optional[str] = None
+
+
+class InvitationAccept(BaseModel):
+    token: str = Field(min_length=32, max_length=256)
+    password: str = Field(min_length=12, max_length=128)
+
+
+class SessionOut(BaseModel):
+    id: str
+    family_id: str
+    created_at: datetime
+    expires_at: datetime
+    revoked_at: Optional[datetime]

@@ -27,6 +27,12 @@ A tenant owner can securely authenticate, create/manage workforce records within
 - Next proposed boundary: `docs/implementation-contracts/DWCO-0.2-ADMIN-SECURITY-CODEX-CONTRACT.md`
 - The proposed DWCO 0.2 contract remains a draft until explicitly approved.
 
+## DWCO 0.3 workforce operations
+
+The bounded workforce-operations contract adds tenant invitations, employee reactivation,
+department-manager assignment, bounded workforce search/pagination, and user-owned refresh-session
+revocation. External delivery providers and production deployment remain deferred.
+
 ## Explicitly deferred
 - external voice/PSTN
 - WebRTC production calling
