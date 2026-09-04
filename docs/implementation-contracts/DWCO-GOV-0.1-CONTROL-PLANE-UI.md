@@ -15,6 +15,7 @@ repository or production control.
 - Stage, PR evidence, reviewer, deviation, and journey views.
 - Docker Compose integration as an isolated unprivileged read-only service.
 - Representative evidence from the current DWCO 0.4 checkpoint.
+- Version-controlled project plan and Mermaid architecture, evidence, record, and gate diagrams.
 
 ## Security boundaries
 
