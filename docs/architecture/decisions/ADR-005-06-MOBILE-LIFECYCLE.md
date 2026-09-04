@@ -6,8 +6,10 @@ DWCO 0.5 supports foreground iOS and Android development builds using a pinned, 
 WebRTC dependency. Expo Go, background wake, push, CallKit, Android Telecom/ConnectionService,
 lock-screen integration, and store release are excluded.
 
-The initiating and first accepting devices hold server-issued call-leg proof tokens in memory and
-present them in addition to normal authentication for signaling and TURN credentials. Other user
+The initiating and first accepting devices generate 256-bit call-leg proof tokens before their
+idempotent commands, retain them in memory, and present them in addition to normal authentication
+for signaling and TURN credentials. A lost response retries with the same proof; proof loss cannot
+rebind and requires authenticated end/timeout before a new call. Other user
 devices receive lifecycle state only. Logout, tenant switch, permission loss, call end, timeout, app
 background, or OS interruption closes tracks, peer connection, timers, and subscriptions. Foreground
 resume obtains a fresh realtime ticket and authoritative HTTP catch-up; it never auto-answers or

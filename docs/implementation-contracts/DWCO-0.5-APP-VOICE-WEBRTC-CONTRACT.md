@@ -71,9 +71,11 @@ evidence. It does not create a production telephony service.
     required to enable a local test tenant. Disabling it blocks
     new calls, signaling advancement, and TURN issuance while preserving authenticated catch-up and
     end/cleanup commands for bounded active local calls.
-12. Bind a call to a server-generated caller leg and first accepting callee leg. Each leg receives a
-    high-entropy proof token that is stored only as a digest, held in client memory, sent in a header,
-    and required in addition to normal authentication for signaling and TURN issuance. It is not a
+12. Bind a call to a caller leg and first accepting callee leg. Before its idempotent initiate or
+    accept request, the device generates a 256-bit random base64url proof, retains it only in memory,
+    and sends it in a header. The server stores only its digest and returns the opaque leg ID, never
+    the proof. Retrying a lost response uses the same command ID and proof. The proof is
+    required in addition to normal authentication for signaling and TURN issuance. It is not a
     replacement for current access-token/membership checks and is destroyed on logout, tenant switch,
     background, or terminal state. Other signed-in devices receive lifecycle state only. The first
     committed call for a canonical participant pair wins simultaneous glare.
@@ -138,7 +140,7 @@ conflict without partial mutation. Terminal calls cannot be revived.
 
 | State | Command/event | Authorized actor | Committed result |
 |---|---|---|---|
-| `ringing` | `accept` after microphone permission | Callee | `accepted`; creates hashed callee-leg proof |
+| `ringing` | `accept` after microphone permission | Callee | `accepted`; validates/stores callee-leg proof digest |
 | `ringing` | `decline` | Callee | `declined` terminal |
 | `ringing` | `cancel` | Caller | `cancelled` terminal |
 | `ringing` | ring deadline | Timeout reconciler | `missed` terminal |
@@ -217,10 +219,13 @@ Proposed HTTP families:
 - `POST /calls/{id}/quality` — coarse participant quality summary after terminal state.
 - `GET /calls/admin/metrics` — permissioned aggregate counts without participant/media content.
 
-Initiate returns the caller's call-leg proof and accept returns the callee's proof once; clients keep
-it in memory and submit it as `X-Call-Leg-Proof` only for signal, media-ready, ICE-restart, and TURN
-credential requests. The server stores only its digest. Ordinary bearer authentication and current
-tenant membership remain mandatory for every request.
+The device supplies `X-Call-Leg-Proof` on initiate or accept and then on signal, media-ready,
+ICE-restart, and TURN credential requests. Proofs contain at least 256 random bits, are base64url and
+constant-time digest-checked, and are never returned or recoverably stored by the server. A lost HTTP
+response is retried with the same idempotency key and in-memory proof. If a process loses the proof,
+the leg cannot rebind in DWCO 0.5; the authenticated participant may end the call, allow its timeout,
+and start a new call after terminal cleanup. Ordinary bearer authentication and current tenant
+membership remain mandatory for every request.
 
 `GET /calls` is the only DWCO 0.5 participant export: opaque cursor pagination, 50 records/page,
 approved metadata fields only, and the 30-day window. Bulk or administrator export is deferred.

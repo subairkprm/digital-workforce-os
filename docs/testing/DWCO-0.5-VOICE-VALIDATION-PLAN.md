@@ -25,7 +25,7 @@ IMPLEMENTATION_AUTHORIZED=NO
 | QA-02 | Migration upgrade/downgrade/re-upgrade and database constraints pass on disposable data without DWCO 0.1–0.4 regression |
 | QA-03 | Ring, accept, decline, caller cancel, either-party end, missed, negotiation failure, reconnect, and duration cap reach exactly one documented state |
 | QA-04 | Invalid actor/state/call-leg/version commands fail without partial mutation; terminal state is immutable |
-| QA-05 | Duplicate commands are idempotent and simultaneous A-to-B/B-to-A glare produces one transactionally selected call |
+| QA-05 | Lost-response retries with the same client proof/command are idempotent; changed proof/payload conflicts; simultaneous A-to-B/B-to-A glare produces one call |
 | QA-06 | Signaling is ordered and bounded; malformed, oversize, duplicate, stale, wrong-role, and expired data is rejected; HTTP recovers missed events |
 | QA-07 | Real peers establish encrypted audio through TURN/UDP and TURN/TCP; expiry, bounded credential reuse, outage, exhaustion, loss, latency, jitter, switch, and restart are deterministic |
 | QA-08 | Supported mobile development builds prove permission, foreground/background, interruption, bound-call-leg, reconnect/relaunch, route, mute, and cleanup behavior |

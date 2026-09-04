@@ -38,8 +38,9 @@ remain open.
   implementation evidence, reviews, acceptance, and merge.
 - Reconciled durable HTTP/PostgreSQL authority with best-effort WebSocket delivery; WebSocket
   signaling notifications are content-free and signal bodies are HTTP-fetched.
-- Replaced undefined access-token session binding with an additional digest-stored, memory-only
-  call-leg proof while preserving normal authentication and fresh membership checks.
+- Replaced undefined access-token session binding with a client-generated, 256-bit, digest-stored,
+  memory-only call-leg proof. Same-proof idempotent retries recover lost responses while normal
+  authentication and fresh membership checks remain mandatory.
 - Replaced an unenforceable one-use TURN claim with explicit bounded reuse until five-minute expiry,
   exact issuance/allocation quotas, and the residual revocation limit.
 - Reconciled `accepted`, `connecting`, media-ready, race, timeout, and terminal transitions with an

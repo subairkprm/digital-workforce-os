@@ -7,6 +7,12 @@ role, and call leg on every command, read, credential issue, and event fan-out. 
 two distinct active same-tenant members participate. Foreign or nonparticipant resources receive a
 non-enumerating denial.
 
+Each device generates a 256-bit base64url call-leg proof before its idempotent initiate/accept
+request, retains it only in memory, and retries a lost response with the same proof/command ID. The
+server stores and constant-time compares only its digest and returns only an opaque leg ID. There is
+no proof recovery or rebinding in DWCO 0.5; proof loss requires authenticated end/timeout and a new
+call. A proof never replaces bearer authentication or fresh membership/participant checks.
+
 The callee deliberately accepts only after microphone permission succeeds; ringing and operating-
 system permission alone are not consent. No microphone audio is acquired or sent before acceptance.
 No administrator can access media or signaling.

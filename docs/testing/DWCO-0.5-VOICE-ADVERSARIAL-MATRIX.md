@@ -13,7 +13,7 @@ IMPLEMENTATION_AUTHORIZED=NO
 | V05 | Either participant ends | Idempotent terminal end; peer notified; tracks, timers, and allocation released | Voice + Backend | QA + SRE |
 | V06 | Ring timeout | Missed at 45 seconds; late commands rejected | Backend | QA |
 | V07 | Simultaneous cross-call glare | First transaction wins one pair/call; loser catches up without double media | Backend + Voice | Architecture + QA |
-| V08 | Duplicate command/signal | Same outcome/version; no duplicate side effect | Backend | QA |
+| V08 | Duplicate/lost-response command or signal | Same proof/command retry recovers outcome/version; changed proof/payload conflicts; no duplicate side effect | Backend | QA + Security |
 | V09 | Out-of-order/replayed signal | Stale generation/revision rejected; terminal call never revives | Backend + Realtime | QA + Security |
 | V10 | Unauthorized client event | Generic publish, wrong role/call-leg, or foreign target rejected without disclosure | Realtime | Security |
 | V11 | Cross-tenant ID substitution | Every call/signal/status/history/credential path denies and emits zero fan-out | Backend + Realtime | Security + QA |

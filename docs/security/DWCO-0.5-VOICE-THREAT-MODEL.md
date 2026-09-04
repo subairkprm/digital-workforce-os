@@ -16,7 +16,7 @@ Redis store, and isolated coturn relay. Client claims and all signaling bodies a
 | Threat | Mandatory control | Stop severity |
 |---|---|---|
 | Cross-tenant/nonparticipant access | Server-derived tenant/actor, fresh membership and participant check on every action/fan-out, non-enumerating denial | Critical |
-| Call control or signaling replay | Versioned monotonic state, command idempotency, digest-stored call-leg proof, ICE generation and revision | High |
+| Call control or signaling replay | Versioned monotonic state, command idempotency, client-generated 256-bit digest-stored call-leg proof, ICE generation and revision | High |
 | Media before consent | Permission then deliberate accept before capture/offer; no auto-answer | Critical |
 | Plaintext/downgraded media | WebRTC DTLS-SRTP only; fingerprint validation; insecure RTP prohibited | Critical |
 | Peer IP/candidate disclosure | Relay-only ICE; candidate/SDP absent from events, logs, durable stores, metrics, and admin UI | High |

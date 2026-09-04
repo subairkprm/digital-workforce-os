@@ -41,13 +41,13 @@ sequenceDiagram
     participant E as Callee
     participant TURN as Local coturn
 
-    C->>API: Initiate(conversation, client_call_id)
-    API->>DB: Verify tenant/members/participants; persist ringing v1
-    API-->>C: Call v1
+    C->>API: Initiate(conversation, command, caller proof)
+    API->>DB: Verify authority; persist ringing v1 + proof digest
+    API-->>C: Call v1 + opaque caller-leg ID
     API->>WS: call.ringing v1
     WS-->>E: Best-effort ring event
     E->>API: GET call catch-up
-    E->>API: Accept(call, version=1, command_id)
+    E->>API: Accept(call, version, command, callee proof)
     API->>DB: Persist accepted v2 and hashed callee-leg proof
     API-->>C: call.accepted v2 via WS
     C->>API: Request ephemeral TURN credential
