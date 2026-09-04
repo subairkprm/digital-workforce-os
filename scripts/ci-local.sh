@@ -94,10 +94,11 @@ cd "$repo_dir/admin-web"
 "$pnpm_cmd" run build
 run_pnpm_audit
 
-echo "[5/7] Mobile install, types, dependency check and audit"
+echo "[5/7] Mobile install, types, tests, dependency check and audit"
 cd "$repo_dir/mobile"
 "$pnpm_cmd" install --frozen-lockfile
 "$pnpm_cmd" run typecheck
+"$pnpm_cmd" run test
 "$pnpm_cmd" run doctor
 run_pnpm_audit
 

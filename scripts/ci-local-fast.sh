@@ -47,6 +47,7 @@ cd "$repo_dir/admin-web"
 echo "[3/4] Mobile types and dependency compatibility"
 cd "$repo_dir/mobile"
 "$pnpm_cmd" run typecheck
+"$pnpm_cmd" run test
 "$pnpm_cmd" run doctor
 
 echo "[4/4] Repository safety and workflow validation"

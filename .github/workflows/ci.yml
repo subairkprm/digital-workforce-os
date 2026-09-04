@@ -83,6 +83,7 @@ jobs:
           cache-dependency-path: mobile/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm run typecheck
+      - run: pnpm run test
       - run: pnpm run doctor
       - run: pnpm audit --audit-level high
 

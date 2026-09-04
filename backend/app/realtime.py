@@ -104,6 +104,7 @@ class RealtimeConnection:
     user_id: str
     permissions: frozenset[str]
     queue: asyncio.Queue[dict[str, object]]
+    revalidate: Optional[Callable[[], Optional[frozenset[str]]]] = None
     sender_task: Optional[asyncio.Task[None]] = None
 
 
@@ -120,6 +121,7 @@ class RealtimeHub:
         tenant_id: str,
         user_id: str,
         permissions: frozenset[str],
+        revalidate: Optional[Callable[[], Optional[frozenset[str]]]] = None,
     ) -> RealtimeConnection:
         await websocket.accept()
         connection = RealtimeConnection(
@@ -128,6 +130,7 @@ class RealtimeHub:
             user_id=user_id,
             permissions=permissions,
             queue=asyncio.Queue(maxsize=MAX_OUTBOUND_EVENTS),
+            revalidate=revalidate,
         )
         self._connections.add(connection)
         connection.sender_task = asyncio.create_task(self._sender(connection))
@@ -149,10 +152,11 @@ class RealtimeHub:
         user_ids: set[str],
         event: dict[str, object],
     ) -> None:
-        await self._publish(
-            event,
-            lambda connection: connection.tenant_id == tenant_id and connection.user_id in user_ids,
-        )
+        for connection in list(self._connections):
+            if connection.tenant_id != tenant_id or connection.user_id not in user_ids:
+                continue
+            if await self._refresh_authorization(connection):
+                await self.send(connection, event)
 
     async def publish_tenant(
         self,
@@ -163,18 +167,18 @@ class RealtimeHub:
         include_user_ids: Optional[set[str]] = None,
     ) -> None:
         included = include_user_ids or set()
-        await self._publish(
-            event,
-            lambda connection: (
-                connection.tenant_id == tenant_id
-                and (
-                    permission is None
-                    or permission in connection.permissions
-                    or "tenant.owner" in connection.permissions
-                    or connection.user_id in included
-                )
-            ),
-        )
+        for connection in list(self._connections):
+            if connection.tenant_id != tenant_id:
+                continue
+            if not await self._refresh_authorization(connection):
+                continue
+            if (
+                permission is None
+                or permission in connection.permissions
+                or "tenant.owner" in connection.permissions
+                or connection.user_id in included
+            ):
+                await self.send(connection, event)
 
     async def send(self, connection: RealtimeConnection, event: dict[str, object]) -> None:
         try:
@@ -182,14 +186,15 @@ class RealtimeHub:
         except asyncio.QueueFull:
             await self.disconnect(connection)
 
-    async def _publish(
-        self,
-        event: dict[str, object],
-        predicate: Callable[[RealtimeConnection], bool],
-    ) -> None:
-        for connection in list(self._connections):
-            if predicate(connection):
-                await self.send(connection, event)
+    async def _refresh_authorization(self, connection: RealtimeConnection) -> bool:
+        if connection.revalidate is None:
+            return True
+        permissions = await asyncio.to_thread(connection.revalidate)
+        if permissions is None:
+            await self.disconnect(connection)
+            return False
+        connection.permissions = permissions
+        return True
 
     async def _sender(self, connection: RealtimeConnection) -> None:
         try:

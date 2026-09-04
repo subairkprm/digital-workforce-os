@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, AppState, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { Conversation, CurrentUser, Employee, Message, Presence, PresenceStatus, RealtimeTicket, newClientMessageId, realtimeUrl, request, signIn, signOut } from "./src/api";
+import { catchUpConversationMessages, mergeConversationMessages } from "./src/realtimeSync";
 import { secureTokenStore, StoredSession } from "./src/tokenStore";
 
 type Workspace = { user: CurrentUser; profile: Employee | null; directory: Employee[]; presence: Presence; directoryPresence: Presence[]; conversations: Conversation[] };
@@ -17,8 +18,33 @@ export default function App() {
   const [messageBody, setMessageBody] = useState("");
   const [realtimeState, setRealtimeState] = useState<"offline" | "connecting" | "live">("offline");
   const activeConversationIdRef = useRef<string | null>(null);
+  const messagesRef = useRef<Message[]>([]);
+  const sessionRef = useRef<StoredSession | null>(null);
 
   useEffect(() => { activeConversationIdRef.current = activeConversationId; }, [activeConversationId]);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
+  useEffect(() => { sessionRef.current = session; }, [session]);
+
+  async function catchUpOpenConversation(active: StoredSession | null = sessionRef.current) {
+    const conversationId = activeConversationIdRef.current;
+    if (!active || !conversationId) return;
+    try {
+      let activeSession = active;
+      const caughtUp = await catchUpConversationMessages(
+        messagesRef.current,
+        async (afterSequence, limit) => {
+          const result = await request<Message[]>(`/messaging/conversations/${conversationId}/messages?after_sequence=${afterSequence}&limit=${limit}`, activeSession);
+          activeSession = result.session;
+          return result.data;
+        },
+      );
+      if (activeConversationIdRef.current !== conversationId) return;
+      setSession(activeSession);
+      setMessages(current => mergeConversationMessages(current, caughtUp));
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Unable to catch up messages after reconnect.");
+    }
+  }
 
   async function loadWorkspace(active: StoredSession, query = "") {
     const me = await request<CurrentUser>("/auth/me", active);
@@ -87,12 +113,15 @@ export default function App() {
         socket = new WebSocket(realtimeUrl(result.data.websocket_path, result.data.ticket));
         socket.onmessage = event => {
           const payload = JSON.parse(String(event.data)) as { type?: string; presence?: Presence; message?: Message; receipt?: { message_id: string; user_id: string } };
-          if (payload.type === "realtime.ready") setRealtimeState("live");
+          if (payload.type === "realtime.ready") {
+            setRealtimeState("live");
+            void catchUpOpenConversation(result.session);
+          }
           if (payload.type === "presence.updated" && payload.presence) {
             setWorkspace(current => current ? { ...current, directoryPresence: [...current.directoryPresence.filter(item => item.employee_id !== payload.presence?.employee_id), payload.presence!] } : current);
           }
           if ((payload.type === "message.created" || payload.type === "message.redacted") && payload.message?.conversation_id === activeConversationIdRef.current) {
-            setMessages(current => [...current.filter(item => item.id !== payload.message?.id), payload.message!].sort((left, right) => left.sequence_number - right.sequence_number));
+            setMessages(current => mergeConversationMessages(current, [payload.message!]));
           }
           if (payload.type === "message.read" && payload.receipt) {
             setMessages(current => current.map(item => item.id === payload.receipt?.message_id && !item.read_by_user_ids.includes(payload.receipt.user_id) ? { ...item, read_by_user_ids: [...item.read_by_user_ids, payload.receipt.user_id] } : item));
@@ -168,7 +197,7 @@ export default function App() {
     try {
       const result = await request<Message>(`/messaging/conversations/${activeConversationId}/messages`, session, { method: "POST", body: JSON.stringify({ client_message_id: newClientMessageId(), body: messageBody.trim() }) });
       setSession(result.session); setMessageBody("");
-      setMessages(current => [...current.filter(item => item.id !== result.data.id), result.data].sort((left, right) => left.sequence_number - right.sequence_number));
+      setMessages(current => mergeConversationMessages(current, [result.data]));
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to send message."); }
   }
 

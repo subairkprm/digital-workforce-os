@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import nullcontext
 from datetime import timedelta
 from typing import Any, cast
 
@@ -8,12 +9,26 @@ import pytest
 import redis
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import QueuePool
 from starlette.websockets import WebSocketDisconnect
 
-from app.models import AuditEvent, Conversation, Message, utcnow
-from app.realtime import MAX_OUTBOUND_EVENTS, RealtimeConnection, RealtimeHub
+from app.database import Base
+from app.models import (
+    AuditEvent,
+    Conversation,
+    Membership,
+    Message,
+    Permission,
+    Role,
+    Tenant,
+    User,
+    utcnow,
+)
+from app.realtime import MAX_OUTBOUND_EVENTS, RealtimeClaims, RealtimeConnection, RealtimeHub
+from app.routers.realtime import authorize_realtime_claims
+from app.security import hash_password
 from tests.conftest import login
 from tests.test_phase1 import headers
 
@@ -182,6 +197,19 @@ def test_message_ordering_idempotency_receipts_and_redaction(
     )
     assert [item["sequence_number"] for item in history.json()] == [1, 2]
     assert history.json()[0]["read_by_user_ids"] == [viewer.id]
+    catch_up = client.get(
+        f"/api/v1/messaging/conversations/{conversation_id}/messages?after_sequence=1&limit=100",
+        headers=headers(owner_tokens, tenant.id),
+    )
+    assert catch_up.status_code == 200
+    assert [item["sequence_number"] for item in catch_up.json()] == [2]
+    assert (
+        client.get(
+            f"/api/v1/messaging/conversations/{conversation_id}/messages?before_sequence=2&after_sequence=1",
+            headers=headers(owner_tokens, tenant.id),
+        ).status_code
+        == 422
+    )
     assert (
         client.get(
             f"/api/v1/messaging/conversations/{conversation_id}/messages?limit=101",
@@ -325,6 +353,7 @@ def test_realtime_ticket_is_one_time_and_membership_is_revalidated(
 ) -> None:
     ticket_redis = FakeTicketRedis()
     monkeypatch.setattr("app.realtime.redis.from_url", lambda *args, **kwargs: ticket_redis)
+    monkeypatch.setattr("app.routers.realtime.SessionLocal", lambda: nullcontext(db))
     tenant = seeded["tenant_a"]
     tokens = login(client)
     response = client.post("/api/v1/realtime/tickets", headers=headers(tokens, tenant.id))
@@ -372,6 +401,43 @@ def test_realtime_ticket_is_one_time_and_membership_is_revalidated(
     assert inactive.value.code == 4403
 
 
+def test_realtime_authorization_releases_bounded_database_pool(tmp_path: Any) -> None:
+    database_path = tmp_path / "realtime-pool.db"
+    pool_engine = create_engine(
+        f"sqlite:///{database_path}",
+        poolclass=QueuePool,
+        pool_size=1,
+        max_overflow=0,
+        pool_timeout=0.1,
+    )
+    PoolSession = sessionmaker(bind=pool_engine, expire_on_commit=False)
+    Base.metadata.create_all(pool_engine)
+    with PoolSession() as db:
+        permission = Permission(code="employee.read")
+        tenant = Tenant(slug="pool", name="Pool")
+        user = User(email="pool@example.com", password_hash=hash_password("correct-password"))
+        db.add_all([permission, tenant, user])
+        db.flush()
+        role = Role(tenant_id=tenant.id, name="Viewer", permissions=[permission])
+        membership = Membership(tenant_id=tenant.id, user_id=user.id, roles=[role])
+        db.add_all([role, membership])
+        db.commit()
+        claims = RealtimeClaims(
+            tenant_id=tenant.id,
+            user_id=user.id,
+            membership_id=membership.id,
+        )
+
+    for _ in range(3):
+        assert authorize_realtime_claims(claims, PoolSession) == frozenset({"employee.read"})
+        assert pool_engine.pool.checkedout() == 0
+
+    with pool_engine.connect() as connection:
+        assert connection.exec_driver_sql("select 1").scalar_one() == 1
+    assert pool_engine.pool.checkedout() == 0
+    pool_engine.dispose()
+
+
 def test_realtime_ticket_store_failure_is_not_bypassed(
     client: TestClient, seeded: dict[str, Any], monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -413,6 +479,57 @@ def test_realtime_backpressure_disconnects_slow_connections() -> None:
         await hub.send(connection, {"overflow": True})
         assert websocket.closed is True
         assert connection not in hub._connections
+
+    asyncio.run(exercise())
+
+
+def test_realtime_fanout_disconnects_revoked_membership() -> None:
+    async def exercise() -> None:
+        websocket = FakeWebSocket()
+        connection = RealtimeConnection(
+            websocket=cast(Any, websocket),
+            tenant_id="tenant",
+            user_id="user",
+            permissions=frozenset({"employee.read"}),
+            queue=asyncio.Queue(maxsize=MAX_OUTBOUND_EVENTS),
+            revalidate=lambda: None,
+        )
+        hub = RealtimeHub()
+        hub._connections.add(connection)
+
+        await hub.publish_users("tenant", {"user"}, {"type": "message.created"})
+
+        assert websocket.closed is True
+        assert connection not in hub._connections
+        assert connection.queue.empty()
+
+    asyncio.run(exercise())
+
+
+def test_realtime_fanout_uses_refreshed_permissions() -> None:
+    async def exercise() -> None:
+        websocket = FakeWebSocket()
+        connection = RealtimeConnection(
+            websocket=cast(Any, websocket),
+            tenant_id="tenant",
+            user_id="user",
+            permissions=frozenset({"employee.read"}),
+            queue=asyncio.Queue(maxsize=MAX_OUTBOUND_EVENTS),
+            revalidate=lambda: frozenset(),
+        )
+        hub = RealtimeHub()
+        hub._connections.add(connection)
+
+        await hub.publish_tenant(
+            "tenant",
+            {"type": "presence.updated"},
+            permission="employee.read",
+        )
+
+        assert websocket.closed is False
+        assert connection in hub._connections
+        assert connection.permissions == frozenset()
+        assert connection.queue.empty()
 
     asyncio.run(exercise())
 

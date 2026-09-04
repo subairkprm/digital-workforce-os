@@ -261,8 +261,14 @@ def list_messages(
     db: Annotated[Session, Depends(get_db)],
     context: Context,
     before_sequence: Annotated[Optional[int], Query(ge=1)] = None,
+    after_sequence: Annotated[Optional[int], Query(ge=0)] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> list[MessageOut]:
+    if before_sequence is not None and after_sequence is not None:
+        raise HTTPException(
+            status_code=422,
+            detail="before_sequence and after_sequence cannot be combined",
+        )
     conversation = _require_conversation(db, context, conversation_id)
     query = select(Message).where(
         Message.tenant_id == context.tenant_id,
@@ -271,8 +277,12 @@ def list_messages(
     )
     if before_sequence is not None:
         query = query.where(Message.sequence_number < before_sequence)
-    messages = list(db.scalars(query.order_by(Message.sequence_number.desc()).limit(limit)))
-    messages.reverse()
+    if after_sequence is not None:
+        query = query.where(Message.sequence_number > after_sequence)
+        messages = list(db.scalars(query.order_by(Message.sequence_number.asc()).limit(limit)))
+    else:
+        messages = list(db.scalars(query.order_by(Message.sequence_number.desc()).limit(limit)))
+        messages.reverse()
     return [_message_out(db, message) for message in messages]
 
 

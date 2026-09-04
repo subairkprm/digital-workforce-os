@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "pnpm@11.19.0",
   "main": "expo/AppEntry.js",
-  "scripts": {"start": "expo start", "typecheck": "tsc --noEmit", "doctor": "expo install --check"},
+  "scripts": {"start": "expo start", "typecheck": "tsc --noEmit", "test": "vitest run", "doctor": "expo install --check"},
   "dependencies": {"expo": "~57.0.20", "expo-secure-store": "~57.0.3", "react": "19.2.3", "react-native": "0.86.3"},
-  "devDependencies": {"@types/react": "^19.2.18", "typescript": "~6.0.3"}
+  "devDependencies": {"@types/react": "^19.2.18", "typescript": "~6.0.3", "vitest": "^4.1.11"}
 }
