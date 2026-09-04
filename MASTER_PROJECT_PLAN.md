@@ -28,24 +28,24 @@ integrations, and communication intelligence.
 | DWCO 0.1 | Foundation, tenancy, identity, core RBAC | 12% | Complete |
 | DWCO 0.2 | Admin and security closure | 10% | Complete |
 | DWCO 0.3 | Workforce operations | 12% | Complete |
-| DWCO 0.4 | Realtime presence and messaging | 14% | Implemented and merged; acceptance review pending |
-| DWCO 0.5 | App-to-app voice/WebRTC | 12% | Not started |
+| DWCO 0.4 | Realtime presence and messaging | 14% | Complete |
+| DWCO 0.5 | App-to-app voice/WebRTC | 12% | Not started; contract approval next |
 | DWCO 0.6 | Telecom/PSTN/PBX provider integration | 12% | Not started |
 | DWCO 0.7 | Mobility/eSIM provider integration | 8% | Not started |
 | DWCO 0.8 | Business integrations | 7% | Not started |
 | DWCO 0.9 | AI communication intelligence | 6% | Not started |
 | DWCO 1.0 | Billing, production operations, and pilot release | 7% | Not started |
-| **Total** |  | **100%** | **Approximately 34% accepted** |
+| **Total** |  | **100%** | **Approximately 48% accepted** |
 
 Weights express product delivery, not elapsed time. Stage credit is earned only at the acceptance
 gate in `docs/roadmap/COMPLETION_MODEL.md`.
 
 ## Current checkpoint
 
-DWCO 0.1, 0.2, and 0.3 are complete and accepted. The bounded DWCO 0.4 realtime communication
-implementation, including its presence prerequisite, is merged through PR #21 and locally validated
-against the exact merged tree. Required independent QA/Validation, Architecture, Identity/Security,
-and DevOps/SRE acceptance is not recorded, so overall accepted completion remains approximately 34%.
+DWCO 0.1 through DWCO 0.4 are complete and accepted. DWCO 0.4 includes its presence prerequisite,
+durable direct messaging, best-effort realtime delivery, reconnect catch-up, and the reviewed
+authorization/session remediation. All required reviewers accepted the bounded local stage;
+DevOps/SRE retained external exceptions. Overall accepted completion is approximately 48%.
 
 Remote GitHub Actions is unresolved because workflows fail to start under the repository account
 condition documented in `docs/LOCAL_CI_FALLBACK.md`. Enforced local gates exist but do not replace
@@ -66,11 +66,10 @@ and cannot authorize customer or production operations.
 
 ## Next approval gate
 
-Close the bounded DWCO 0.4 acceptance review against its approved contract. Record independent
-QA/Validation regression review and Architecture, Identity/Security, and DevOps/SRE acceptance of
-the transport, data, authorization, operations, and local-CI fallback boundaries. Only then may the
-stage receive its 14-percentage-point weight. After acceptance, the next permitted activity is a
-separate DWCO 0.5 app-to-app voice/WebRTC contract; implementation is not yet authorized.
+Draft and review a separate DWCO 0.5 app-to-app voice/WebRTC contract. Before implementation, the
+gate must approve media architecture, WebRTC identity and consent, TURN/coturn boundaries,
+abuse controls, observability, network-failure tests, rollback, and the continued exclusion of
+PSTN/SIP/PBX and recording. DWCO 0.5 implementation is not yet authorized.
 
 ## Explicit non-authorization
 

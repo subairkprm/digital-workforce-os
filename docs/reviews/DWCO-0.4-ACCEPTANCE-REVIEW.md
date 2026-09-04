@@ -1,6 +1,6 @@
 # DWCO 0.4 acceptance review
 
-REVIEW_STATUS=REMEDIATION_SIGN_OFFS_COMPLETE_MERGE_PENDING
+REVIEW_STATUS=COMPLETE
 
 MERGED_EVIDENCE=PR_21_MAIN_D965126
 
@@ -8,7 +8,7 @@ TECHNICAL_VALIDATION=PASS_LOCAL_REMEDIATION_97E3664
 
 REMOTE_CI=UNRESOLVED_NO_USABLE_GITHUB_ATTESTATION
 
-STAGE_CREDIT=UNCHANGED_AT_34_PERCENT_OVERALL
+STAGE_CREDIT=ACCEPTED_14_POINTS_48_PERCENT_OVERALL
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 
@@ -24,7 +24,7 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 | Architecture review | Pass | Short DB authorization lifetime, bounded HTTP catch-up, and failure containment accepted |
 | Identity/Security review | Pass | Runtime revocation, permission refresh, and fail-closed store-failure behavior accepted |
 | DevOps/SRE review | Pass with external exceptions | Isolated CI and live-control-plane coexistence accepted; DEP-001 remains |
-| Project status reconciliation | Pending merge | Accepted weight remains 34% until this exact remediation is merged |
+| Project status reconciliation | Pass | Canonical closure records DWCO 0.4 complete and approximately 48% overall |
 
 ## Review findings
 
@@ -34,8 +34,8 @@ authorization until disconnect, and mobile reconnect did not perform the contrac
 history catch-up. A bounded remediation is implemented under
 `docs/implementation-contracts/DWCO-0.4-ACCEPTANCE-REMEDIATION.md`. All four required review roles
 now accept the bounded remediation, with DevOps/SRE external exceptions. The stage remains
-**Implemented, pending acceptance** until the reviewed commits are merged and canonical status is
-reconciled.
+**Complete** because the reviewed commits are on `main` and this canonical status reconciliation
+records the accepted stage weight.
 
 Residual risks are explicit:
 
@@ -49,13 +49,11 @@ Residual risks are explicit:
 
 ## Closure actions
 
-1. Review and merge the exact approved remediation commits; do not squash away the evidence binding
-   without updating this record.
-2. Keep the DevOps/SRE external exceptions and no-deployment boundary visible.
-3. Reconcile `PROJECT_STATUS.md` and `docs/roadmap/COMPLETION_MODEL.md` to 48% only after all required
-   acceptance evidence is recorded.
-4. Keep DWCO-009 open until GitHub Actions runs successfully and required branch protection is
+1. Keep the DevOps/SRE external exceptions and no-deployment boundary visible.
+2. Keep DWCO-009 open until GitHub Actions runs successfully and required branch protection is
    enabled.
+3. Use `docs/reviews/DWCO-0.5-CONTRACT-APPROVAL.md` as the next approval gate; do not implement
+   voice/WebRTC before its contract is approved.
 
 ## Next-stage boundary
 
