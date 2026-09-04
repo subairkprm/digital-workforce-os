@@ -55,4 +55,4 @@ ROLLBACK_GUIDANCE=Stop local clients and back up any non-disposable database; ru
 permissions; revert the DWCO 0.4 realtime implementation commit. No shared or production rollback is
 authorized by this report
 
-VERSION_CONTROL_STATUS=REVIEW_BRANCH_UNMERGED_ACCEPTANCE_AND_STAGE_WEIGHT_UNCHANGED
+VERSION_CONTROL_STATUS=MERGED_TO_MAIN_AT_D965126_ACCEPTANCE_REVIEW_PENDING_STAGE_WEIGHT_UNCHANGED
