@@ -23,6 +23,7 @@ The Phase 1 monorepo contains:
 - `backend/` — FastAPI, SQLAlchemy, Alembic, Redis-backed realtime tickets and security tests
 - `admin-web/` — authenticated Next.js administration and messaging-metadata shell
 - `mobile/` — Expo/React Native login, directory, presence, direct messaging and secure token storage
+- `governance-web/` — read-only project governance and quality control-plane template
 
 Start the local API, PostgreSQL and Redis services:
 
@@ -30,6 +31,10 @@ Start the local API, PostgreSQL and Redis services:
 cp .env.example .env
 docker compose up --build
 ```
+
+The governance control-plane template is available at `http://localhost:3100`. It is intentionally
+isolated from tenant data, GitHub credentials, approvals, merges, and deployment controls. Port 3100
+avoids the admin development port (3000) and the API/database/cache ports.
 
 Create the first local tenant owner after the API migration completes:
 
