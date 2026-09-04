@@ -18,6 +18,8 @@ PERMISSIONS = [
     "audit.read",
     "security.read",
     "membership.manage",
+    "message.metadata.read",
+    "message.retention.manage",
 ]
 
 

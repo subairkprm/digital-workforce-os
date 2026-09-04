@@ -4,10 +4,10 @@
 |---|---|---|---|---|---|
 | DEP-001 | GitHub Actions account/workflow startup | Blocked externally | No remote CI attestation | DevOps/SRE | Successful run and protected required checks |
 | DEP-002 | Local CI fallback | Active mitigation | Trusted-machine evidence only | DevOps/SRE + QA | Maintain until DEP-001 closes |
-| DEP-003 | Realtime transport decision | Approval required | Blocks full DWCO 0.4 design | Architecture + Realtime | Approved ADR/contract |
-| DEP-004 | Message persistence/delivery semantics | Approval required | Blocks schema/API acceptance | Backend + Realtime | Approved model and failure semantics |
-| DEP-005 | Retention, deletion, privacy, abuse policy | Approval required | Blocks communication data | Identity/Security | Approved policy and tests |
-| DEP-006 | Push provider/credentials | Not selected | Blocks background mobile delivery | Mobile + Integration | Approved adapter/environment plan |
+| DEP-003 | Realtime transport decision | Implemented locally; review pending | WebSocket tickets plus HTTP catch-up selected | Architecture + Realtime | DWCO 0.4 contract, operations guide, tests |
+| DEP-004 | Message persistence/delivery semantics | Implemented locally; review pending | Direct durable ordered messaging selected | Backend + Realtime | DWCO 0.4 contract, migration, tests |
+| DEP-005 | Retention, deletion, privacy, abuse policy | Implemented locally; review pending | 90-day expiry, sender redaction, bounded access | Identity/Security | DWCO 0.4 contract, operations guide, tests |
+| DEP-006 | Push provider/credentials | Deferred; null adapter active | No background provider delivery | Mobile + Integration | Separate provider/environment approval |
 | DEP-007 | TURN/WebRTC infrastructure | Not started | Blocks production app voice | Voice/WebRTC + DevOps/SRE | Later approved contract |
 | DEP-008 | Authorised PSTN/SIP/PBX provider | Not started | Blocks business telephony | Telecom/PBX + Integration | Provider/legal approval |
 | DEP-009 | Carrier/eSIM provider | Not started | Blocks mobility provisioning | Mobility/eSIM + Integration | Provider/regulatory approval |

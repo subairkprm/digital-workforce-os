@@ -1,6 +1,12 @@
-# DWCO 0.4 — Realtime communication contract (draft)
+# DWCO 0.4 — Realtime communication contract
 
-CONTRACT_STATUS=DRAFT_NOT_APPROVED
+CONTRACT_STATUS=APPROVED_FOR_LOCAL_IMPLEMENTATION_AND_REVIEW
+
+APPROVED_ON=2026-09-04
+
+APPROVAL_SCOPE=BOUNDED_DEVELOPMENT_AND_REVIEW_ONLY
+
+IMPLEMENTATION_STATUS=LOCAL_IMPLEMENTATION_COMPLETE_REVIEW_PENDING
 
 ## Objective
 
@@ -8,7 +14,7 @@ Extend the merged polling-based presence prerequisite into secure tenant realtim
 and bounded workforce messaging without introducing voice, telecom, AI, billing, or production
 deployment.
 
-## Proposed in scope
+## In scope
 
 - Authenticated realtime connections with server-derived tenant and membership context.
 - Presence transport preserving existing ownership and 120-second expiry invariants.
@@ -19,16 +25,34 @@ deployment.
 - Migrations, provider-neutral notification boundary, observability events, and tests.
 - Retention, deletion, export, failure-mode, and local-rollback documentation.
 
-## Required decisions before approval
+## Approved decisions
 
-1. WebSocket, SSE, or hybrid transport and authenticated connection renewal.
-2. Direct-only versus group/conversation model and participant rules.
-3. Ordering, idempotency, retry, offline delivery, and receipt semantics.
-4. Retention/deletion/export policy and tenant administration boundary.
-5. Push notification provider boundary and sensitive-content minimisation.
-6. Abuse controls, payload/attachment limits, and reporting boundary.
-7. Operations observability without message-content surveillance.
-8. Remote CI prerequisite for merge while DEP-001 remains unresolved.
+1. Use WebSocket for best-effort live events and authenticated HTTP for durable commands and
+   catch-up. A one-time, Redis-backed connection ticket expires after 60 seconds; access and refresh
+   tokens are never placed in a WebSocket URL. Reconnection obtains a new ticket and resumes through
+   bounded sequence-based HTTP history.
+2. Support direct conversations only. Each conversation contains exactly two distinct users with
+   active memberships in the same server-verified tenant. Group, guest, public, and federated
+   conversations are deferred.
+3. Persist accepted messages before fan-out. Messages receive a per-conversation monotonic sequence;
+   sender-provided client message IDs provide idempotency. Realtime delivery is best effort, offline
+   delivery is durable history, and read receipts are explicit participant actions. No exactly-once
+   network-delivery claim is made.
+4. Messages receive a 90-day expiry. Expired content is excluded from history and may be purged by a
+   permissioned, audited tenant maintenance action. Senders may redact their own messages. Participant
+   history is the only bounded export in this stage; tenant-wide or administrative content export is
+   deferred.
+5. Provide a provider-neutral notification adapter with a no-op local implementation. Notifications
+   carry identifiers only and never message bodies. No provider, credential, or background push
+   delivery is authorized.
+6. Limit message bodies to 4,000 characters, disallow attachments, cap history at 100 records, cap
+   send mutations at 30 per minute per actor, cap realtime frames at 8 KiB, and cap each connection's
+   outbound queue at 100 events. No content-reporting workflow is introduced in this stage.
+7. Record structured connection, authorization, rate-limit, and aggregate messaging metadata without
+   message content, raw tickets, credentials, or participant surveillance.
+8. The enforced local fast/full/Docker gates remain mandatory while DEP-001 is open. Remote CI status
+   must be reported truthfully and cannot be represented as passing. Merge remains a separate explicit
+   repository decision after review.
 
 ## Security and privacy invariants
 
@@ -49,7 +73,7 @@ deployment.
 - Billing, payments, subscriptions, production deployment, or production data migration.
 - Unbounded attachments, public/federated messaging, and external guest communication.
 
-## Proposed ownership and review
+## Ownership and review
 
 ACCOUNTABLE=Implementation Director
 
@@ -59,7 +83,7 @@ REQUIRED_REVIEWERS=Architecture,Identity/Security,DevOps/SRE,QA/Validation
 
 CONSULTED=Admin Web,Integration
 
-## Proposed acceptance criteria
+## Acceptance criteria
 
 - Required decisions are recorded here or in linked ADRs.
 - Migration round-trip passes without behavior changes outside scope.
@@ -76,3 +100,10 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED
 
 Approval would authorize bounded development and review only. A separate operations/deployment
 contract is required for any shared or production environment.
+
+## Local implementation evidence
+
+The review branch implements the approved direct-messaging, one-time-ticket WebSocket, mobile,
+metadata-only admin, retention, notification-boundary, migration, and adversarial-test scope. The
+completion report is `docs/completion-reports/DWCO-0.4-REALTIME-COMMUNICATION.md`. This evidence does
+not authorize merge or deployment and does not update accepted stage weight.

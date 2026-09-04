@@ -3,9 +3,12 @@ import { secureTokenStore, StoredSession } from "./tokenStore";
 const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export type CurrentUser = { id: string; email: string; tenant_id: string; permissions: string[] };
-export type Employee = { id: string; employee_number: string; full_name: string; work_email: string; title?: string; is_suspended: boolean };
+export type Employee = { id: string; user_id?: string; employee_number: string; full_name: string; work_email: string; title?: string; is_suspended: boolean };
 export type PresenceStatus = "available" | "away" | "busy" | "offline";
 export type Presence = { employee_id?: string; employee_name?: string; status: PresenceStatus; last_seen_at?: string; expires_at?: string };
+export type Conversation = { id: string; participant_user_ids: string[]; peer_user_id: string; last_message_at?: string; created_at: string };
+export type Message = { id: string; conversation_id: string; sender_user_id: string; client_message_id: string; sequence_number: number; body?: string; created_at: string; expires_at: string; deleted_at?: string; read_by_user_ids: string[] };
+export type RealtimeTicket = { ticket: string; expires_in_seconds: number; websocket_path: string };
 type TokenPair = { access_token: string; refresh_token: string };
 
 async function errorFor(response: Response): Promise<Error> {
@@ -51,4 +54,15 @@ export async function signIn(tenantId: string, email: string, password: string):
 export async function signOut(session: StoredSession): Promise<void> {
   await fetch(`${apiUrl}/api/v1/auth/logout`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.accessToken}` }, body: JSON.stringify({ refresh_token: session.refreshToken }) }).catch(() => undefined);
   await secureTokenStore.clear();
+}
+
+export function realtimeUrl(path: string, ticket: string): string {
+  const url = new URL(`${apiUrl}${path}`);
+  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+  url.searchParams.set("ticket", ticket);
+  return url.toString();
+}
+
+export function newClientMessageId(): string {
+  return `mobile-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 }

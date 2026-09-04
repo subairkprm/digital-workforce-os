@@ -5,7 +5,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { InvitationPanel } from "./InvitationPanel";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-type Section = "Dashboard" | "Employees" | "Departments" | "Presence" | "Invitations" | "Roles" | "Sessions" | "Audit";
+type Section = "Dashboard" | "Employees" | "Departments" | "Presence" | "Messaging" | "Invitations" | "Roles" | "Sessions" | "Audit";
 type CurrentUser = { email: string; tenant_id: string; permissions: string[] };
 type Employee = { id: string; employee_number: string; full_name: string; work_email: string; title?: string; is_suspended: boolean };
 type Department = { id: string; name: string; description?: string; manager_employee_id?: string };
@@ -15,7 +15,8 @@ type AuditEvent = { id: string; action: string; resource_type: string; created_a
 type Invitation = { id: string; email: string; role_ids: string[]; expires_at: string; accepted_at?: string; revoked_at?: string; token?: string };
 type Session = { id: string; created_at: string; expires_at: string; revoked_at?: string };
 type Presence = { employee_id?: string; employee_name?: string; status: "available" | "away" | "busy" | "offline"; last_seen_at?: string };
-const sectionPermission: Record<Section, string | null> = { Dashboard: null, Employees: "employee.read", Departments: "employee.read", Presence: "employee.read", Invitations: "membership.manage", Roles: "role.manage", Sessions: null, Audit: "audit.read" };
+type MessagingMetrics = { conversation_count: number; active_message_count: number; expired_message_count: number; oldest_active_message_at?: string; newest_message_at?: string };
+const sectionPermission: Record<Section, string | null> = { Dashboard: null, Employees: "employee.read", Departments: "employee.read", Presence: "employee.read", Messaging: "message.metadata.read", Invitations: "membership.manage", Roles: "role.manage", Sessions: null, Audit: "audit.read" };
 
 export default function AdminShell() {
   const [token, setToken] = useState<string | null>(null), [refreshToken, setRefreshToken] = useState<string | null>(null), [tenantId, setTenantId] = useState(""), [me, setMe] = useState<CurrentUser | null>(null);
@@ -43,9 +44,9 @@ export default function AdminShell() {
   const visibleSections = useMemo(() => (Object.keys(sectionPermission) as Section[]).filter(name => !sectionPermission[name] || can(sectionPermission[name]!)), [can]);
   const loadSection = useCallback(async () => {
     if (!token || !me || section === "Dashboard") { setItems([]); return; }
-    const paths = { Employees: "/employees", Departments: "/departments", Presence: "/presence", Invitations: "/invitations", Roles: "/roles", Sessions: "/auth/sessions", Audit: "/audit-events" };
+    const paths = { Employees: "/employees", Departments: "/departments", Presence: "/presence", Messaging: "/messaging/admin/metrics", Invitations: "/invitations", Roles: "/roles", Sessions: "/auth/sessions", Audit: "/audit-events" };
     const query = (section === "Employees" || section === "Departments") && search ? `?q=${encodeURIComponent(search)}` : "";
-    setLoading(true); setError(""); try { setItems(await api(`${paths[section]}${query}`) as unknown[]); } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to load data."); } finally { setLoading(false); }
+    setLoading(true); setError(""); try { const result = await api(`${paths[section]}${query}`); setItems(section === "Messaging" ? [result] : result as unknown[]); } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to load data."); } finally { setLoading(false); }
   }, [api, me, search, section, token]);
   useEffect(() => { void loadSection(); }, [loadSection]);
   async function create(event: FormEvent<HTMLFormElement>, path: string, fields: string[]) {
@@ -59,6 +60,7 @@ export default function AdminShell() {
 
 function Workspace({ section, items, can, create, api, reload }: { section: Section; items: unknown[]; can: (p: string) => boolean; create: (e: FormEvent<HTMLFormElement>, p: string, f: string[]) => Promise<void>; api: (p: string, i?: RequestInit) => Promise<unknown>; reload: () => Promise<void> }) {
   if (section === "Dashboard") return <article className="card"><p className="eyebrow">Tenant workspace</p><h2>Workforce administration</h2><p>Choose a permitted area. Every mutation is authorized and audited by the API.</p></article>;
+  if (section === "Messaging") { const metrics = items[0] as MessagingMetrics | undefined; return <article className="card"><p className="eyebrow">Privacy-preserving operations</p><h2>Messaging metadata</h2>{!metrics ? <p className="state">No messaging metrics available.</p> : <ul className="records"><li><div><strong>{metrics.conversation_count}</strong><span>Direct conversations</span></div></li><li><div><strong>{metrics.active_message_count}</strong><span>Active messages</span></div></li><li><div><strong>{metrics.expired_message_count}</strong><span>Expired messages awaiting purge</span></div></li></ul>}<p className="muted">Administrators cannot view message content from this area.</p></article>; }
   return <div className="workspace">{section === "Employees" && can("employee.create") && <form className="card formGrid" onSubmit={e => create(e, "/employees", ["employee_number", "full_name", "work_email", "title"])}><h2>Add employee</h2><input aria-label="Employee number" name="employee_number" placeholder="Employee number" required /><input aria-label="Full name" name="full_name" placeholder="Full name" required /><input aria-label="Work email" name="work_email" type="email" placeholder="Work email" required /><input aria-label="Title" name="title" placeholder="Title" /><button className="primary">Create</button></form>}{section === "Departments" && can("department.manage") && <form className="card formGrid" onSubmit={e => create(e, "/departments", ["name", "description"])}><h2>Add department</h2><input aria-label="Department name" name="name" placeholder="Name" required /><input aria-label="Description" name="description" placeholder="Description" /><button className="primary">Create</button></form>}{section === "Invitations" && <InvitationPanel api={api} reload={reload} />}{section === "Roles" && can("role.manage") && <form className="card formGrid" onSubmit={e => create(e, "/roles", ["name", "permissions"])}><h2>Add role</h2><input aria-label="Role name" name="name" placeholder="Name" required /><input aria-label="Permissions" name="permissions" placeholder="employee.read, employee.update" /><button className="primary">Create</button></form>}<div className="card"><h2>{section}</h2>{items.length === 0 ? <p className="state">No records yet.</p> : <ul className="records">{items.map((raw, index) => { const record = raw as { id?: string; employee_id?: string }; return <RecordRow key={record.id ?? record.employee_id ?? index} section={section} item={raw as Employee & Department & Role & AuditEvent & Invitation & Session & Presence} can={can} api={api} reload={reload} />; })}</ul>}</div>{section === "Roles" && <MembershipRoles api={api} roles={items as Role[]} />}</div>;
 }
 function RecordRow({ section, item, can, api, reload }: { section: Section; item: Employee & Department & Role & AuditEvent & Invitation & Session & Presence; can: (p:string) => boolean; api: (p:string,i?:RequestInit)=>Promise<unknown>; reload:()=>Promise<void> }) {

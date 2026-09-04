@@ -38,10 +38,12 @@ implemented and merged, including polling-based status, heartbeat expiry, admin 
 mobile controls. That capability is valid prerequisite evidence, not approval of production
 realtime transport or the complete DWCO 0.4 stage.
 
-The draft stage contract is
-`docs/implementation-contracts/DWCO-0.4-REALTIME-COMMUNICATION-CONTRACT.md`. Implementation must not
-start until its approval gate is recorded. WebSocket/SSE transport, durable messaging, push,
-retention, abuse controls, and operational readiness remain unapproved.
+The stage contract at
+`docs/implementation-contracts/DWCO-0.4-REALTIME-COMMUNICATION-CONTRACT.md` is approved for bounded
+local implementation and review. The approved design uses one-time Redis-backed WebSocket tickets,
+HTTP message authority and catch-up, direct conversations, 90-day retention, metadata-only
+administration, and a no-op provider-neutral notification boundary. Merge, shared infrastructure,
+and production deployment remain separate decisions.
 
 ## Later boundaries
 

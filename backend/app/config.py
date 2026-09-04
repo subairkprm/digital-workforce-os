@@ -16,7 +16,11 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
     auth_rate_limit: int = 10
     mutation_rate_limit: int = 120
+    message_send_rate_limit: int = 30
+    realtime_ticket_rate_limit: int = 10
     rate_limit_window_seconds: int = 60
+    realtime_ticket_ttl_seconds: int = 60
+    message_retention_days: int = 90
 
 
 @lru_cache

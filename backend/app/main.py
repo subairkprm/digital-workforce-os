@@ -14,7 +14,9 @@ from app.routers import (
     departments,
     employees,
     invitations,
+    messaging,
     presence,
+    realtime,
     roles,
     security_events,
 )
@@ -24,7 +26,7 @@ structlog.configure(
     processors=[structlog.processors.TimeStamper(fmt="iso"), structlog.processors.JSONRenderer()]
 )
 
-app = FastAPI(title="DWCO API", version="0.4.0")
+app = FastAPI(title="DWCO API", version="0.4.1")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_settings().cors_origins,
@@ -40,6 +42,8 @@ app.include_router(roles.router, prefix="/api/v1")
 app.include_router(security_events.router, prefix="/api/v1")
 app.include_router(invitations.router, prefix="/api/v1")
 app.include_router(presence.router, prefix="/api/v1")
+app.include_router(messaging.router, prefix="/api/v1")
+app.include_router(realtime.router, prefix="/api/v1")
 
 
 @app.get("/health")
