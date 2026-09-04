@@ -53,6 +53,10 @@ remote CI or branch protection.
 
 ## Delivery governance
 
+The internal governance control-plane journey is documented in
+`docs/roadmap/GOVERNANCE_CONTROL_PLANE_PLAN.md`. DWCO-GOV does not contribute product-stage weight
+and cannot authorize customer or production operations.
+
 1. The Implementation Director proposes a bounded contract and named owner/reviewers.
 2. Architecture, security, data, operations, and dependency risks are reviewed before approval.
 3. Implementation occurs on a bounded branch with no scope expansion.

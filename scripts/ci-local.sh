@@ -28,6 +28,49 @@ else echo "Docker Desktop is required"; exit 1
 fi
 ci_venv="$repo_dir/backend/.ci-venv"
 compose_started=0
+ci_compose_project=${DWCO_CI_COMPOSE_PROJECT:-dwco-ci}
+ci_governance_port=${DWCO_CI_GOVERNANCE_PORT:-13100}
+ci_api_port=${DWCO_CI_API_PORT:-18000}
+ci_postgres_port=${DWCO_CI_POSTGRES_PORT:-15432}
+ci_redis_port=${DWCO_CI_REDIS_PORT:-16379}
+
+compose_ci() {
+  DWCO_GOVERNANCE_PORT="$ci_governance_port" \
+    DWCO_API_PORT="$ci_api_port" \
+    DWCO_POSTGRES_PORT="$ci_postgres_port" \
+    DWCO_REDIS_PORT="$ci_redis_port" \
+    "$docker_cmd" compose \
+      --project-name "$ci_compose_project" \
+      -f "$repo_dir/docker-compose.yml" \
+      --project-directory "$repo_dir" \
+      "$@"
+}
+
+run_pnpm_audit() {
+  audit_attempt=1
+  while ! npm_config_fetch_retries=0 "$pnpm_cmd" audit --audit-level high; do
+    if [ "$audit_attempt" -ge 3 ]; then
+      echo "Dependency audit registry remained unavailable after 3 attempts"
+      return 1
+    fi
+    audit_attempt=$((audit_attempt + 1))
+    echo "Dependency audit registry unavailable; retrying ($audit_attempt/3)"
+    sleep 5
+  done
+}
+
+run_python_audit() {
+  audit_attempt=1
+  while ! "$ci_venv/bin/python" -m pip_audit --skip-editable --timeout 60; do
+    if [ "$audit_attempt" -ge 3 ]; then
+      echo "Python dependency audit service remained unavailable after 3 attempts"
+      return 1
+    fi
+    audit_attempt=$((audit_attempt + 1))
+    echo "Python dependency audit service unavailable; retrying ($audit_attempt/3)"
+    sleep 5
+  done
+}
 
 run_pnpm_audit() {
   audit_attempt=1
@@ -57,7 +100,7 @@ run_python_audit() {
 
 cleanup() {
   if [ "$compose_started" -eq 1 ]; then
-    "$docker_cmd" compose -f "$repo_dir/docker-compose.yml" --project-directory "$repo_dir" down -v
+    compose_ci down -v --remove-orphans
   fi
 }
 trap cleanup EXIT INT TERM
@@ -105,6 +148,10 @@ run_pnpm_audit
 echo "[6/7] Repository and workflow validation"
 cd "$repo_dir"
 "$ci_venv/bin/python" -c 'import pathlib,yaml; yaml.safe_load(pathlib.Path(".github/workflows/ci.yml").read_text())'
+cd "$repo_dir/governance-data"
+"$ci_venv/bin/python" -m unittest -v test_server.py
+"$node_cmd" --check "$repo_dir/governance-web/app.js"
+cd "$repo_dir"
 git diff --check
 if git ls-files | grep -E '(^|/)\.env($|\.)' | grep -v '\.env\.example$'; then
   echo "Tracked dotenv secret file detected"
@@ -112,14 +159,14 @@ if git ls-files | grep -E '(^|/)\.env($|\.)' | grep -v '\.env\.example$'; then
 fi
 
 echo "[7/7] Docker build, migration and live readiness"
-"$docker_cmd" compose config --quiet
+compose_ci config --quiet
 compose_started=1
-"$docker_cmd" compose up -d --build
+compose_ci up -d --build governance-data governance-web api postgres redis
 attempt=0
-until curl --silent --show-error --fail http://localhost:8000/readyz >/dev/null; do
+until curl --silent --show-error --fail "http://localhost:$ci_api_port/readyz" >/dev/null; do
   attempt=$((attempt + 1))
   if [ "$attempt" -ge 30 ]; then
-    "$docker_cmd" compose logs --no-color api
+    compose_ci logs --no-color api
     exit 1
   fi
   sleep 2
@@ -128,5 +175,12 @@ curl --silent --show-error --fail http://localhost:8000/health >/dev/null
 curl --silent --show-error --fail http://localhost:8000/livez >/dev/null
 test "$("$docker_cmd" compose exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0005_realtime_messaging"
 test "$("$docker_cmd" compose exec -T redis redis-cli ping)" = "PONG"
+curl --silent --show-error --fail "http://localhost:$ci_api_port/health" >/dev/null
+curl --silent --show-error --fail "http://localhost:$ci_api_port/livez" >/dev/null
+curl --silent --show-error --fail "http://localhost:$ci_governance_port/healthz" >/dev/null
+curl --silent --show-error --fail "http://localhost:$ci_governance_port/api/governance" \
+  | "$ci_venv/bin/python" -c 'import json,sys; data=json.load(sys.stdin); accepted=data["metrics"]["acceptedCompletion"]; implemented=data["metrics"]["implementedCompletion"]; assert 0 <= accepted <= implemented <= 100; assert data["stages"]; assert data["meta"]["currentGate"]'
+test "$(compose_ci exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0005_realtime_messaging"
+test "$(compose_ci exec -T redis redis-cli ping)" = "PONG"
 
 echo "LOCAL_CI=PASS"
