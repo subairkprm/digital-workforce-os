@@ -35,6 +35,9 @@ docker compose up --build
 The governance control-plane template is available at `http://localhost:3100`. It is intentionally
 isolated from tenant data, GitHub credentials, approvals, merges, and deployment controls. Port 3100
 avoids the admin development port (3000) and the API/database/cache ports.
+Its GOV 0.2A local evidence service reads only the mounted canonical project records and refreshes
+the browser every 15 seconds. No restart is required after a saved document change. The live badge
+shows the current evidence digest; GitHub PR/check synchronization remains deliberately disabled.
 See `docs/roadmap/GOVERNANCE_CONTROL_PLANE_PLAN.md` for the project plan, safety boundaries, Mermaid
 architecture, record model, evidence flow, and product-readiness gates.
 
