@@ -1,10 +1,10 @@
 # DWCO 0.4 acceptance review
 
-REVIEW_STATUS=PENDING_REQUIRED_SIGN_OFFS
+REVIEW_STATUS=REMEDIATION_SIGN_OFFS_COMPLETE_MERGE_PENDING
 
 MERGED_EVIDENCE=PR_21_MAIN_D965126
 
-TECHNICAL_VALIDATION=PASS_LOCAL_EXACT_MERGED_TREE
+TECHNICAL_VALIDATION=PASS_LOCAL_REMEDIATION_97E3664
 
 REMOTE_CI=UNRESOLVED_NO_USABLE_GITHUB_ATTESTATION
 
@@ -20,11 +20,11 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 | Implementation and migration merged | Pass | PR #21; merge commit `d965126`; migration `0005_realtime_messaging` |
 | Local tests, builds, audits, migration, and Docker checks | Pass | `docs/completion-reports/DWCO-0.4-REALTIME-COMMUNICATION.md` |
 | Completion report and rollback boundary | Pass | Completion report records gaps, rollback, and no-deployment state |
-| Independent QA/Validation review | Fail; remediation re-review pending | Major mobile HTTP reconnect catch-up finding is implemented on the remediation branch |
-| Architecture review | Fail; remediation re-review pending | High database-session lifetime finding is implemented on the remediation branch |
-| Identity/Security review | Fail; remediation re-review pending | High established-socket revocation finding is implemented on the remediation branch |
-| DevOps/SRE review | Pass with external exceptions | Bounded local evidence accepted; DEP-001 and no-deployment boundary remain |
-| Project status reconciliation | In progress | This review and status-reconciliation change |
+| Independent QA/Validation review | Pass | Paginated reconnect gap/retry/cap behavior and exact-tree local evidence accepted |
+| Architecture review | Pass | Short DB authorization lifetime, bounded HTTP catch-up, and failure containment accepted |
+| Identity/Security review | Pass | Runtime revocation, permission refresh, and fail-closed store-failure behavior accepted |
+| DevOps/SRE review | Pass with external exceptions | Isolated CI and live-control-plane coexistence accepted; DEP-001 remains |
+| Project status reconciliation | Pending merge | Accepted weight remains 34% until this exact remediation is merged |
 
 ## Review findings
 
@@ -32,8 +32,10 @@ Independent review identified two High findings and one Major finding in the mer
 database sessions remained open for WebSocket lifetime, established sockets retained stale
 authorization until disconnect, and mobile reconnect did not perform the contract-required HTTP
 history catch-up. A bounded remediation is implemented under
-`docs/implementation-contracts/DWCO-0.4-ACCEPTANCE-REMEDIATION.md`; required re-review is pending.
-The stage therefore remains **Implemented, pending acceptance**.
+`docs/implementation-contracts/DWCO-0.4-ACCEPTANCE-REMEDIATION.md`. All four required review roles
+now accept the bounded remediation, with DevOps/SRE external exceptions. The stage remains
+**Implemented, pending acceptance** until the reviewed commits are merged and canonical status is
+reconciled.
 
 Residual risks are explicit:
 
@@ -47,13 +49,12 @@ Residual risks are explicit:
 
 ## Closure actions
 
-1. Complete full local and Docker validation for the bounded remediation.
-2. QA/Validation, Architecture, and Identity/Security independently re-review the fixes and evidence.
-3. Keep the DevOps/SRE external exceptions and no-deployment boundary visible.
-4. Merge the approved remediation before changing canonical status.
-5. Reconcile `PROJECT_STATUS.md` and `docs/roadmap/COMPLETION_MODEL.md` to 48% only after all required
+1. Review and merge the exact approved remediation commits; do not squash away the evidence binding
+   without updating this record.
+2. Keep the DevOps/SRE external exceptions and no-deployment boundary visible.
+3. Reconcile `PROJECT_STATUS.md` and `docs/roadmap/COMPLETION_MODEL.md` to 48% only after all required
    acceptance evidence is recorded.
-6. Keep DWCO-009 open until GitHub Actions runs successfully and required branch protection is
+4. Keep DWCO-009 open until GitHub Actions runs successfully and required branch protection is
    enabled.
 
 ## Next-stage boundary
