@@ -31,7 +31,7 @@ quality gates are passing evidence, but they are not GitHub-attested CI.
 These three accepted stages contribute 34 percentage points under
 `docs/roadmap/COMPLETION_MODEL.md`.
 
-## Next approval boundary: DWCO 0.4
+## Current acceptance boundary: DWCO 0.4
 
 The next planned stage is realtime communication. A narrow presence contract has already been
 implemented and merged, including polling-based status, heartbeat expiry, admin visibility, and
@@ -39,11 +39,15 @@ mobile controls. That capability is valid prerequisite evidence, not approval of
 realtime transport or the complete DWCO 0.4 stage.
 
 The stage contract at
-`docs/implementation-contracts/DWCO-0.4-REALTIME-COMMUNICATION-CONTRACT.md` is approved for bounded
-local implementation and review. The approved design uses one-time Redis-backed WebSocket tickets,
-HTTP message authority and catch-up, direct conversations, 90-day retention, metadata-only
-administration, and a no-op provider-neutral notification boundary. Merge, shared infrastructure,
-and production deployment remain separate decisions.
+`docs/implementation-contracts/DWCO-0.4-REALTIME-COMMUNICATION-CONTRACT.md` was approved for bounded
+local implementation and review. PR #21 merged the design based on one-time Redis-backed WebSocket
+tickets, HTTP message authority and catch-up, direct conversations, 90-day retention, metadata-only
+administration, and a no-op provider-neutral notification boundary. The stage remains pending
+acceptance until the required independent reviewers are recorded. Shared infrastructure and
+production deployment remain separate decisions.
+
+After DWCO 0.4 acceptance, a separate contract is required before any DWCO 0.5 app-to-app
+voice/WebRTC implementation.
 
 ## Later boundaries
 

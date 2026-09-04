@@ -6,7 +6,7 @@ APPROVED_ON=2026-09-04
 
 APPROVAL_SCOPE=BOUNDED_DEVELOPMENT_AND_REVIEW_ONLY
 
-IMPLEMENTATION_STATUS=LOCAL_IMPLEMENTATION_COMPLETE_REVIEW_PENDING
+IMPLEMENTATION_STATUS=MERGED_TO_MAIN_ACCEPTANCE_REVIEW_PENDING
 
 ## Objective
 
@@ -101,9 +101,10 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED
 Approval would authorize bounded development and review only. A separate operations/deployment
 contract is required for any shared or production environment.
 
-## Local implementation evidence
+## Merged implementation evidence
 
-The review branch implements the approved direct-messaging, one-time-ticket WebSocket, mobile,
-metadata-only admin, retention, notification-boundary, migration, and adversarial-test scope. The
-completion report is `docs/completion-reports/DWCO-0.4-REALTIME-COMMUNICATION.md`. This evidence does
-not authorize merge or deployment and does not update accepted stage weight.
+PR #21 merged the approved direct-messaging, one-time-ticket WebSocket, mobile, metadata-only admin,
+retention, notification-boundary, migration, and adversarial-test scope to `main` at `d965126`. The
+completion report is `docs/completion-reports/DWCO-0.4-REALTIME-COMMUNICATION.md`. Required
+independent acceptance is not yet recorded, so this evidence does not update accepted stage weight
+or authorize deployment.
