@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import secrets
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -15,6 +16,7 @@ from app.config import get_settings
 from app.dependencies import RequestContext
 
 MAX_OUTBOUND_EVENTS = 100
+logger = logging.getLogger(__name__)
 
 
 class RealtimeStoreUnavailable(RuntimeError):
@@ -189,7 +191,12 @@ class RealtimeHub:
     async def _refresh_authorization(self, connection: RealtimeConnection) -> bool:
         if connection.revalidate is None:
             return True
-        permissions = await asyncio.to_thread(connection.revalidate)
+        try:
+            permissions = await asyncio.to_thread(connection.revalidate)
+        except Exception:
+            logger.warning("Realtime authorization revalidation failed; disconnecting socket")
+            await self.disconnect(connection)
+            return False
         if permissions is None:
             await self.disconnect(connection)
             return False

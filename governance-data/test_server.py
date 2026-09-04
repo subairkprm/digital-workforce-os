@@ -47,6 +47,8 @@ REVIEW_STATUS=PENDING_REQUIRED_SIGN_OFFS
 |---|---|---|
 | Local tests | Pass | Report |
 | QA review | Open | Independent validation |
+| Security review | Fail; remediation pending | Re-review required |
+| Status reconciliation | In progress | Merge required |
 
 ## Review findings
 
@@ -79,7 +81,8 @@ class SnapshotTests(unittest.TestCase):
 
         self.assertEqual(snapshot["metrics"]["acceptedCompletion"], 34)
         self.assertEqual(snapshot["metrics"]["implementedCompletion"], 26)
-        self.assertEqual(snapshot["metrics"]["openReviews"], 1)
+        self.assertEqual(snapshot["metrics"]["openReviews"], 3)
+        self.assertEqual(len(snapshot["openReviews"]), 3)
         self.assertEqual(snapshot["metrics"]["activeExceptions"], 2)
         self.assertEqual(snapshot["stages"][1]["state"], "review")
         self.assertEqual(snapshot["blockingDependencies"][0]["ID"], "DEP-001")

@@ -534,6 +534,32 @@ def test_realtime_fanout_uses_refreshed_permissions() -> None:
     asyncio.run(exercise())
 
 
+def test_realtime_fanout_contains_authorization_store_failure() -> None:
+    def unavailable() -> None:
+        raise RuntimeError("database unavailable")
+
+    async def exercise() -> None:
+        websocket = FakeWebSocket()
+        connection = RealtimeConnection(
+            websocket=cast(Any, websocket),
+            tenant_id="tenant",
+            user_id="user",
+            permissions=frozenset(),
+            queue=asyncio.Queue(maxsize=MAX_OUTBOUND_EVENTS),
+            revalidate=unavailable,
+        )
+        hub = RealtimeHub()
+        hub._connections.add(connection)
+
+        await hub.publish_users("tenant", {"user"}, {"type": "message.created"})
+
+        assert websocket.closed is True
+        assert connection not in hub._connections
+        assert connection.queue.empty()
+
+    asyncio.run(exercise())
+
+
 def test_realtime_fanout_is_tenant_user_and_permission_scoped() -> None:
     async def exercise() -> None:
         hub = RealtimeHub()

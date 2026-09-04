@@ -2,7 +2,7 @@
 
 REVIEW_STATUS=REMEDIATION_IMPLEMENTED_REVIEW_PENDING
 
-BASELINE=MAIN_8D37E17
+BASELINE=MAIN_19680CD
 
 ACCEPTED_WEIGHTED_COMPLETION=UNCHANGED_AT_34_PERCENT_APPROXIMATE
 
@@ -22,9 +22,9 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 | Area | Evidence | Status |
 |---|---|---|
 | Database lifetime | `authorize_realtime_claims` uses a short session before socket acceptance; bounded QueuePool test checks zero retained connections | Implemented; re-review pending |
-| Runtime revocation | Hub refreshes authorization before user/tenant fan-out, disconnects inactive membership, and refreshes permission filters | Implemented; re-review pending |
+| Runtime revocation | Hub refreshes authorization before user/tenant fan-out, disconnects inactive membership, refreshes permission filters, and contains authorization-store failure per connection | Implemented; re-review pending |
 | Mobile reconnect | `realtime.ready` triggers authenticated, paginated `after_sequence` HTTP history for the open conversation; reconciliation deduplicates/sorts, retries once per page, and fails visibly at a 1,000-message safety cap | Implemented; re-review pending |
-| Automated checks | 34 backend tests at 92% coverage, 8 admin tests/build, mobile gap/pagination/retry/reconciliation tests, dependency audits, migration round-trip, Docker build/readiness, and workflow/repository checks | Revalidation pending after QA follow-up |
+| Automated checks | 35 backend tests at 92% coverage, 8 admin tests/build, 5 mobile gap/pagination/retry/reconciliation tests, dependency audits, migration round-trip, Docker build/readiness, governance tests, workflow/repository checks, isolated CI cleanup, and live governance pre/post health | Final revalidation pending |
 
 ## Residual boundaries
 

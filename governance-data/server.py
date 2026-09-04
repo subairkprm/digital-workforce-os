@@ -106,6 +106,13 @@ def stage_state(status: str) -> str:
     return "future"
 
 
+def review_is_open(result: str) -> bool:
+    normalized = result.casefold()
+    return any(
+        term in normalized for term in ("open", "pending", "fail", "in progress")
+    )
+
+
 def classify_exception(risk: str) -> tuple[str, str, str]:
     normalized = risk.casefold()
     if any(term in normalized for term in ("github", "remote ci", "protected")):
@@ -155,9 +162,7 @@ def build_snapshot(root: Path) -> dict[str, Any]:
             }
         )
 
-    open_reviews = [
-        gate for gate in gates if gate.get("Result", "").casefold() == "open"
-    ]
+    open_reviews = [gate for gate in gates if review_is_open(gate.get("Result", ""))]
     residual_risks = parse_bullets(
         section(documents["acceptance_review"], "Review findings")
     )

@@ -4,7 +4,7 @@ CONTRACT_ID=DWCO-0.4-ACCEPTANCE-REMEDIATION
 
 STATUS=AUTHORIZED_BOUNDED_REMEDIATION
 
-BASELINE=MAIN_8D37E17
+BASELINE=MAIN_19680CD
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED
 
@@ -18,7 +18,9 @@ expanding the product stage or changing the durable HTTP messaging contract.
 1. End database authorization sessions before WebSocket acceptance and prove that repeated/live
    connections do not hold the bounded SQLAlchemy pool.
 2. Revalidate tenant, user, membership, and permission state before each subsequent server fan-out.
-   Disconnect an inactive context; refresh permissions before permission-filtered delivery.
+   Disconnect an inactive context; refresh permissions before permission-filtered delivery; contain
+   an authorization-store failure per connection so a post-commit fan-out cannot fail the HTTP
+   mutation response.
 3. On each mobile `realtime.ready` event, use authenticated, bounded `after_sequence` HTTP history
    pages to catch up the currently open conversation, deduplicate by server message ID, and restore
    server sequence order. Retry one transient request failure and surface an explicit error if the

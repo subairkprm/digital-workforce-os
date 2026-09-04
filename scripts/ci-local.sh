@@ -33,6 +33,8 @@ ci_governance_port=${DWCO_CI_GOVERNANCE_PORT:-13100}
 ci_api_port=${DWCO_CI_API_PORT:-18000}
 ci_postgres_port=${DWCO_CI_POSTGRES_PORT:-15432}
 ci_redis_port=${DWCO_CI_REDIS_PORT:-16379}
+live_governance_url=${DWCO_LIVE_GOVERNANCE_URL:-http://localhost:3100}
+live_governance_detected=0
 
 compose_ci() {
   DWCO_GOVERNANCE_PORT="$ci_governance_port" \
@@ -72,38 +74,23 @@ run_python_audit() {
   done
 }
 
-run_pnpm_audit() {
-  audit_attempt=1
-  while ! npm_config_fetch_retries=0 "$pnpm_cmd" audit --audit-level high; do
-    if [ "$audit_attempt" -ge 3 ]; then
-      echo "Dependency audit registry remained unavailable after 3 attempts"
-      return 1
-    fi
-    audit_attempt=$((audit_attempt + 1))
-    echo "Dependency audit registry unavailable; retrying ($audit_attempt/3)"
-    sleep 5
-  done
-}
-
-run_python_audit() {
-  audit_attempt=1
-  while ! "$ci_venv/bin/python" -m pip_audit --skip-editable --timeout 60; do
-    if [ "$audit_attempt" -ge 3 ]; then
-      echo "Python dependency audit service remained unavailable after 3 attempts"
-      return 1
-    fi
-    audit_attempt=$((audit_attempt + 1))
-    echo "Python dependency audit service unavailable; retrying ($audit_attempt/3)"
-    sleep 5
-  done
-}
-
 cleanup() {
   if [ "$compose_started" -eq 1 ]; then
     compose_ci down -v --remove-orphans
   fi
 }
 trap cleanup EXIT INT TERM
+
+assert_live_governance() {
+  curl --silent --show-error --fail "$live_governance_url/healthz" >/dev/null
+  curl --silent --show-error --fail "$live_governance_url/api/governance" >/dev/null
+}
+
+if curl --silent --fail "$live_governance_url/healthz" >/dev/null 2>&1; then
+  assert_live_governance
+  live_governance_detected=1
+  echo "LIVE_GOVERNANCE_PRECHECK=PASS"
+fi
 
 echo "[1/7] Preparing isolated Python environment"
 if [ ! -x "$ci_venv/bin/python" ]; then
@@ -171,10 +158,6 @@ until curl --silent --show-error --fail "http://localhost:$ci_api_port/readyz" >
   fi
   sleep 2
 done
-curl --silent --show-error --fail http://localhost:8000/health >/dev/null
-curl --silent --show-error --fail http://localhost:8000/livez >/dev/null
-test "$("$docker_cmd" compose exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0005_realtime_messaging"
-test "$("$docker_cmd" compose exec -T redis redis-cli ping)" = "PONG"
 curl --silent --show-error --fail "http://localhost:$ci_api_port/health" >/dev/null
 curl --silent --show-error --fail "http://localhost:$ci_api_port/livez" >/dev/null
 curl --silent --show-error --fail "http://localhost:$ci_governance_port/healthz" >/dev/null
@@ -182,5 +165,16 @@ curl --silent --show-error --fail "http://localhost:$ci_governance_port/api/gove
   | "$ci_venv/bin/python" -c 'import json,sys; data=json.load(sys.stdin); accepted=data["metrics"]["acceptedCompletion"]; implemented=data["metrics"]["implementedCompletion"]; assert 0 <= accepted <= implemented <= 100; assert data["stages"]; assert data["meta"]["currentGate"]'
 test "$(compose_ci exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0005_realtime_messaging"
 test "$(compose_ci exec -T redis redis-cli ping)" = "PONG"
+
+compose_ci down -v --remove-orphans
+compose_started=0
+if "$docker_cmd" ps -aq --filter "label=com.docker.compose.project=$ci_compose_project" | grep -q .; then
+  echo "Isolated CI containers were not fully removed"
+  exit 1
+fi
+if [ "$live_governance_detected" -eq 1 ]; then
+  assert_live_governance
+  echo "LIVE_GOVERNANCE_POSTCHECK=PASS"
+fi
 
 echo "LOCAL_CI=PASS"
