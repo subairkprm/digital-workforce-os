@@ -6,7 +6,7 @@ APPROVED_ON=2026-09-04
 
 APPROVAL_SCOPE=BOUNDED_DEVELOPMENT_AND_REVIEW_ONLY
 
-IMPLEMENTATION_STATUS=LOCAL_IMPLEMENTATION_COMPLETE_REVIEW_PENDING
+IMPLEMENTATION_STATUS=MERGED_TO_MAIN_ACCEPTANCE_REVIEW_PENDING
 
 ## Objective
 
@@ -43,13 +43,13 @@ deployment.
    history is the only bounded export in this stage; tenant-wide or administrative content export is
    deferred.
 5. Provide a provider-neutral notification adapter with a no-op local implementation. Notifications
-   carry identifiers only and never message bodies. No provider, credential, or background push
+   carry identifiers only and never message bodies. No provider, credentials or background push
    delivery is authorized.
 6. Limit message bodies to 4,000 characters, disallow attachments, cap history at 100 records, cap
    send mutations at 30 per minute per actor, cap realtime frames at 8 KiB, and cap each connection's
    outbound queue at 100 events. No content-reporting workflow is introduced in this stage.
 7. Record structured connection, authorization, rate-limit, and aggregate messaging metadata without
-   message content, raw tickets, credentials, or participant surveillance.
+   message content, raw tickets, crdentials, or participant surveillance.
 8. The enforced local fast/full/Docker gates remain mandatory while DEP-001 is open. Remote CI status
    must be reported truthfully and cannot be represented as passing. Merge remains a separate explicit
    repository decision after review.
@@ -77,7 +77,7 @@ deployment.
 
 ACCOUNTABLE=Implementation Director
 
-RESPONSIBLE=Realtime,Backend,Mobile
+RESPONSIBL=Realtime,Backend,Mobile
 
 REQUIRED_REVIEWERS=Architecture,Identity/Security,DevOps/SRE,QA/Validation
 
@@ -91,7 +91,7 @@ CONSULTED=Admin Web,Integration
   ordering/idempotency, bounds, rate-limit, and backpressure tests pass.
 - Existing DWCO 0.1–0.4 presence regressions pass.
 - Backend, admin, mobile, dependency audit, and Docker readiness gates pass.
-- Remote CI is stated truthfully; local evidence is attached if DEP-001 remains open.
+- Remote CI is stated trthfully; local evidence is attached if DEP-001 remains open.
 - Completion report, dependency updates, rollback, and deployment status are reviewed.
 
 ## Deployment boundary
@@ -101,9 +101,10 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED
 Approval would authorize bounded development and review only. A separate operations/deployment
 contract is required for any shared or production environment.
 
-## Local implementation evidence
+## Merged implementation evidence
 
-The review branch implements the approved direct-messaging, one-time-ticket WebSocket, mobile,
-metadata-only admin, retention, notification-boundary, migration, and adversarial-test scope. The
-completion report is `docs/completion-reports/DWCO-0.4-REALTIME-COMMUNICATION.md`. This evidence does
-not authorize merge or deployment and does not update accepted stage weight.
+PR #21 merged the approved direct-messaging, one-time-ticket WebSocket, mobile, metadata-only admin,
+retention, notification-boundary, migration, and adversarial-test scope to `main` at `d965126`. The
+completion report is `docs/completion-reports/DWCO-0.4-REALTIME-COMMUNICATION.md`. Required
+independent acceptance is not yet recorded, so this evidence does not update accepted stage weight
+or authorize deployment.
