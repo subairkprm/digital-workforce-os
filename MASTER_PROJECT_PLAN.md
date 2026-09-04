@@ -28,7 +28,7 @@ integrations, and communication intelligence.
 | DWCO 0.1 | Foundation, tenancy, identity, core RBAC | 12% | Complete |
 | DWCO 0.2 | Admin and security closure | 10% | Complete |
 | DWCO 0.3 | Workforce operations | 12% | Complete |
-| DWCO 0.4 | Realtime presence and messaging | 14% | Local implementation complete; review/merge pending |
+| DWCO 0.4 | Realtime presence and messaging | 14% | Implemented and merged; acceptance review pending |
 | DWCO 0.5 | App-to-app voice/WebRTC | 12% | Not started |
 | DWCO 0.6 | Telecom/PSTN/PBX provider integration | 12% | Not started |
 | DWCO 0.7 | Mobility/eSIM provider integration | 8% | Not started |
@@ -42,16 +42,20 @@ gate in `docs/roadmap/COMPLETION_MODEL.md`.
 
 ## Current checkpoint
 
-DWCO 0.1, 0.2, and 0.3 are complete and accepted. A bounded DWCO 0.4 presence capability has also
-been merged and locally validated. The complete realtime-communication contract is approved and its
-bounded local implementation and completion evidence are ready for review, but have not been
-accepted or merged. Overall accepted completion therefore remains approximately 34%.
+DWCO 0.1, 0.2, and 0.3 are complete and accepted. The bounded DWCO 0.4 realtime communication
+implementation, including its presence prerequisite, is merged through PR #21 and locally validated
+against the exact merged tree. Required independent QA/Validation, Architecture, Identity/Security,
+and DevOps/SRE acceptance is not recorded, so overall accepted completion remains approximately 34%.
 
 Remote GitHub Actions is unresolved because workflows fail to start under the repository account
 condition documented in `docs/LOCAL_CI_FALLBACK.md`. Enforced local gates exist but do not replace
 remote CI or branch protection.
 
 ## Delivery governance
+
+The internal governance control-plane journey is documented in
+`docs/roadmap/GOVERNANCE_CONTROL_PLANE_PLAN.md`. DWCO-GOV does not contribute product-stage weight
+and cannot authorize customer or production operations.
 
 1. The Implementation Director proposes a bounded contract and named owner/reviewers.
 2. Architecture, security, data, operations, and dependency risks are reviewed before approval.
@@ -62,10 +66,11 @@ remote CI or branch protection.
 
 ## Next approval gate
 
-Review the bounded DWCO 0.4 implementation evidence against its approved contract, including
-transport choice, messaging semantics, data/retention rules, tenancy and authorization invariants,
-mobile/background behavior, observability, abuse limits, migrations, tests, and rollback. Merge is
-a separate explicit repository decision while remote CI remains blocked.
+Close the bounded DWCO 0.4 acceptance review against its approved contract. Record independent
+QA/Validation regression review and Architecture, Identity/Security, and DevOps/SRE acceptance of
+the transport, data, authorization, operations, and local-CI fallback boundaries. Only then may the
+stage receive its 14-percentage-point weight. After acceptance, the next permitted activity is a
+separate DWCO 0.5 app-to-app voice/WebRTC contract; implementation is not yet authorized.
 
 ## Explicit non-authorization
 
