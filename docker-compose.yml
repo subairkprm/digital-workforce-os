@@ -1,4 +1,16 @@
 services:
+  governance-web:
+    build: ./governance-web
+    ports:
+      - "${DWCO_GOVERNANCE_PORT:-3100}:8080"
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
   api:
     build: ./backend
     environment:
