@@ -72,6 +72,32 @@ run_python_audit() {
   done
 }
 
+run_pnpm_audit() {
+  audit_attempt=1
+  while ! npm_config_fetch_retries=0 "$pnpm_cmd" audit --audit-level high; do
+    if [ "$audit_attempt" -ge 3 ]; then
+      echo "Dependency audit registry remained unavailable after 3 attempts"
+      return 1
+    fi
+    audit_attempt=$((audit_attempt + 1))
+    echo "Dependency audit registry unavailable; retrying ($audit_attempt/3)"
+    sleep 5
+  done
+}
+
+run_python_audit() {
+  audit_attempt=1
+  while ! "$ci_venv/bin/python" -m pip_audit --skip-editable --timeout 60; do
+    if [ "$audit_attempt" -ge 3 ]; then
+      echo "Python dependency audit service remained unavailable after 3 attempts"
+      return 1
+    fi
+    audit_attempt=$((audit_attempt + 1))
+    echo "Python dependency audit service unavailable; retrying ($audit_attempt/3)"
+    sleep 5
+  done
+}
+
 cleanup() {
   if [ "$compose_started" -eq 1 ]; then
     compose_ci down -v --remove-orphans
@@ -144,6 +170,10 @@ until curl --silent --show-error --fail "http://localhost:$ci_api_port/readyz" >
   fi
   sleep 2
 done
+curl --silent --show-error --fail http://localhost:8000/health >/dev/null
+curl --silent --show-error --fail http://localhost:8000/livez >/dev/null
+test "$("$docker_cmd" compose exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0005_realtime_messaging"
+test "$("$docker_cmd" compose exec -T redis redis-cli ping)" = "PONG"
 curl --silent --show-error --fail "http://localhost:$ci_api_port/health" >/dev/null
 curl --silent --show-error --fail "http://localhost:$ci_api_port/livez" >/dev/null
 curl --silent --show-error --fail "http://localhost:$ci_governance_port/healthz" >/dev/null

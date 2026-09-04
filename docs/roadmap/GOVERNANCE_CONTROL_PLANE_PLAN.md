@@ -69,6 +69,7 @@ flowchart TB
     DB[(PostgreSQL\nlocalhost:5432)]
     Redis[(Redis\nlocalhost:6379)]
 
+    Browser -->|read static project evidence| Gov
     Browser -->|poll normalized evidence| Gov --> Evidence --> Docs
     Browser --> Admin --> API
     API --> DB
@@ -153,6 +154,7 @@ flowchart LR
 | Phase | Capability | Security boundary | Exit gate |
 |---|---|---|---|
 | GOV 0.1 | Local read-only dashboard template | No credentials, APIs, persistence, or mutations | Docker/local validation |
+| GOV 0.2 | Trusted document and GitHub read ingestion | Read-only token, minimal scopes, signed inputs | Data accuracy and threat review |
 | GOV 0.2A | Live local document ingestion | Whitelisted read-only mounts, no credential or external network | Parser, freshness and isolation evidence |
 | GOV 0.2B | GitHub PR/check read ingestion | Read-only token, minimal scopes, server-side adapter | Permission, data accuracy and threat review |
 | GOV 0.3 | Authenticated role-based review workspace | MFA, least privilege, audit, no self-approval | Independent security/QA acceptance |
@@ -181,6 +183,9 @@ are exposed; a provider/legal dependency is unapproved; or critical/high risk re
 
 ## Next approval checkpoint
 
+Accept GOV 0.1 as a local UI template only. Before GOV 0.2, approve the ingestion architecture,
+GitHub permission scopes, source reconciliation rules, data classification, authentication/RBAC,
+audit model, and an explicit rule that the control plane cannot merge or deploy.
 Review GOV 0.2A as a credential-free local live-evidence reader. Before GOV 0.2B, approve GitHub
 permission scopes, source reconciliation rules, data classification, credential storage and
 rotation, rate/failure handling, audit model, and an explicit rule that the control plane cannot

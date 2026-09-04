@@ -43,4 +43,5 @@ Credential-free local document refresh is separately bounded by
 - UI works at desktop and narrow layouts and exposes no mutating controls.
 - Existing application behavior remains unchanged.
 
+DEPLOYMENT_STATUS=LOCAL_ONLY_NOT_AUTHORIZED_FOR_PRODUCTION
 DEPLOYMENT_STATUL=LOCAL_ONLY_NOT_AUTHORIZED_FOR_PRODUCTION
