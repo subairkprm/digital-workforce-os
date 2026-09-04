@@ -1,10 +1,10 @@
 # DWCO 0.4 acceptance remediation review record
 
-REVIEW_STATUS=REQUIRED_SIGN_OFFS_COMPLETE_MERGE_PENDING
+REVIEW_STATUS=COMPLETE
 
 BASELINE=MAIN_19680CD
 
-ACCEPTED_WEIGHTED_COMPLETION=UNCHANGED_AT_34_PERCENT_APPROXIMATE
+ACCEPTED_WEIGHTED_COMPLETION=48_PERCENT_APPROXIMATE
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 
@@ -48,7 +48,6 @@ IMPLEMENTATION_EVIDENCE=539D07A_97E3664
 
 ## Acceptance rule
 
-This branch cannot change accepted stage weight. All required reviewer decisions are now recorded,
-but DWCO 0.4 remains at 0% accepted contribution until commits `539d07a` and `97e3664` (plus this
-evidence record) are merged and the canonical status is reconciled from merged evidence. Only then
-may overall accepted completion move from approximately 34% to 48%.
+All required reviewer decisions are recorded and commits `539d07a`, `97e3664`, and `607e6c0` are on
+`main`. This canonical closure reconciles DWCO 0.4 to its 14-percentage-point contribution and moves
+overall accepted completion from approximately 34% to 48% without authorizing deployment.

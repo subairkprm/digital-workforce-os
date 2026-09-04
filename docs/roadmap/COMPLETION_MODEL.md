@@ -14,19 +14,19 @@ change and must not be used to manufacture progress.
 | DWCO 0.1 | 12% | 100% | 12% |
 | DWCO 0.2 | 10% | 100% | 10% |
 | DWCO 0.3 | 12% | 100% | 12% |
-| DWCO 0.4 | 14% | 0% | 0% |
+| DWCO 0.4 | 14% | 100% | 14% |
 | DWCO 0.5 | 12% | 0% | 0% |
 | DWCO 0.6 | 12% | 0% | 0% |
 | DWCO 0.7 | 8% | 0% | 0% |
 | DWCO 0.8 | 7% | 0% | 0% |
 | DWCO 0.9 | 6% | 0% | 0% |
 | DWCO 1.0 | 7% | 0% | 0% |
-| **Total** | **100%** |  | **34%** |
+| **Total** | **100%** |  | **48%** |
 
-The complete DWCO 0.4 realtime communication implementation is merged through PR #21 and has local
-technical evidence. It remains at 0% accepted under this model because required independent
-QA/Validation, Architecture, Identity/Security, and DevOps/SRE acceptance is not recorded. Merged
-implementation must not be confused with accepted stage credit.
+DWCO 0.4 is accepted through the original implementation and the bounded remediation on `main` at
+`607e6c0`. Architecture, Identity/Security, and QA/Validation passed; DevOps/SRE passed with the
+documented DEP-001 and no-deployment exceptions. Its 14-percentage-point contribution raises overall
+accepted completion from approximately 34% to 48%.
 
 ## Stage acceptance gate
 
@@ -40,8 +40,10 @@ A stage is accepted only when all are true:
 6. A completion report identifies remaining gaps and deployment status.
 7. `PROJECT_STATUS.md` is reconciled with the merged evidence.
 
-Remote CI is the required authority. While DEP-001 is open, local fallback evidence must state that
-remote CI is unresolved and may not claim remote verification.
+Remote CI and protected required checks remain the target authority. While DEP-001 is externally
+open, independently reviewed local fallback evidence may support bounded local stage acceptance only
+when it states that remote CI is unresolved; it cannot claim remote verification or authorize a
+shared/production deployment.
 
 ## Status vocabulary
 

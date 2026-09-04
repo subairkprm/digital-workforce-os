@@ -4,9 +4,9 @@ CONTRACT_ID=DWCO-0.4-ACCEPTANCE-REMEDIATION
 
 IMPLEMENTATION_EVIDENCE=539D07A_97E3664
 
-STATUS=REVIEWED_MERGE_PENDING
+STATUS=MERGED_TO_MAIN_ACCEPTED
 
-ACCEPTED_WEIGHTED_COMPLETION=UNCHANGED_AT_34_PERCENT_APPROXIMATE
+ACCEPTED_WEIGHTED_COMPLETION=48_PERCENT_APPROXIMATE
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 
@@ -59,8 +59,7 @@ REVIEWS=ARCHITECTURE_PASS_IDENTITY_SECURITY_PASS_QA_VALIDATION_PASS_DEVOPS_SRE_P
 
 ## Recommended next approval gate
 
-Approve and merge the exact remediation PR without deploying it. After merge, run a documentation-
-only status reconciliation that records DWCO 0.4 complete and updates accepted weighted completion
-from approximately 34% to 48%. Only after that gate closes may a separate DWCO 0.5 app-to-app
-voice/WebRTC contract be drafted for approval.
-
+Merge the documentation-only status reconciliation without deploying it. The next active gate is
+DWCO 0.5 contract approval; app-to-app voice/WebRTC implementation may begin only after that separate
+contract passes Architecture, Identity/Security, QA/Validation, DevOps/SRE, and Implementation
+Director approval.
