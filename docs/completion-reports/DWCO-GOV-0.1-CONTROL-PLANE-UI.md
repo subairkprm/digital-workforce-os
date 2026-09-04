@@ -3,7 +3,8 @@
 CONTRACT_ID=DWCO-GOV-0.1-CONTROL-PLANE-UI
 
 FILES_CHANGED=Isolated static governance UI, unprivileged nginx image/config, Docker Compose service,
-local port setting, README usage, implementation contract, and this report
+local port setting, README usage, master-plan link, Mermaid project plan, implementation contract,
+and this report
 
 APPLICATION_CHANGES=NONE; no backend, tenant admin, mobile, database, migration, Redis, identity,
 messaging, realtime, or production behavior changed
