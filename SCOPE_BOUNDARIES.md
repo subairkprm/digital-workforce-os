@@ -5,22 +5,26 @@
 - Local platform foundation, tenancy, identity, RBAC, audit, and security controls.
 - Admin/security workflows and workforce operations through DWCO 0.3.
 
-## Implemented prerequisite, not full-stage acceptance
+## Implemented and merged, pending stage acceptance
 
 - Tenant-scoped presence status, polling, heartbeat expiry, directory visibility, admin read access,
   and mobile controls under `DWCO-0.4-PRESENCE`.
+- One-time authenticated realtime connections, live presence events, direct same-tenant messaging,
+  durable bounded history, explicit receipts, sender redaction, retention maintenance, a no-op
+  provider-neutral notification boundary, and metadata-only administration under DWCO 0.4.
 
-## Approved implementation boundary
+The complete implementation is merged through PR #21, but DWCO 0.4 does not receive stage credit
+until the required independent acceptance reviews are recorded.
 
-DWCO 0.4 realtime communication is approved for bounded local implementation and review. It covers
-one-time authenticated realtime connections, live presence events, direct same-tenant messaging,
-durable bounded history, explicit receipts, sender redaction, retention maintenance, a no-op
-provider-neutral notification boundary, metadata-only administration, tests, and local verification.
+## Current acceptance boundary
 
-Approval does not authorize merge, shared-environment operation, or production deployment. The
+DWCO 0.4 realtime communication is under acceptance review. Review is limited to the merged contract,
+implementation, migration, tests, local verification, residual risks, and rollback evidence.
+
+Acceptance does not authorize shared-environment operation or production deployment. The
 process-local fan-out implementation must not be represented as production multi-instance realtime.
 
-## Explicitly outside the next boundary
+## Explicitly outside the current boundary
 
 - PSTN, emergency calling, numbering, lawful-intercept obligations, SIP trunks, PBX, or production
   WebRTC calling.
