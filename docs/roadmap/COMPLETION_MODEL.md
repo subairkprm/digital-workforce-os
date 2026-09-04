@@ -23,9 +23,10 @@ change and must not be used to manufacture progress.
 | DWCO 1.0 | 7% | 0% | 0% |
 | **Total** | **100%** |  | **34%** |
 
-The merged DWCO 0.4 presence capability is prerequisite evidence. It does not mean the realtime
-communication stage—including transport, messaging, retention, mobile delivery, and operations—is
-accepted.
+The complete DWCO 0.4 realtime communication implementation is merged through PR #21 and has local
+technical evidence. It remains at 0% accepted under this model because required independent
+QA/Validation, Architecture, Identity/Security, and DevOps/SRE acceptance is not recorded. Merged
+implementation must not be confused with accepted stage credit.
 
 ## Stage acceptance gate
 
