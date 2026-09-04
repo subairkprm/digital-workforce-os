@@ -32,24 +32,29 @@ if [ ! -d "$repo_dir/admin-web/node_modules" ] || [ ! -d "$repo_dir/mobile/node_
   exit 1
 fi
 
-echo "[1/4] Backend lint, types and tests"
+echo "[1/5] Backend lint, types and tests"
 cd "$repo_dir/backend"
 "$ci_venv/bin/python" -m ruff check .
 "$ci_venv/bin/python" -m ruff format --check .
 "$ci_venv/bin/python" -m mypy app
 "$ci_venv/bin/python" -m pytest -q
 
-echo "[2/4] Admin types and tests"
+echo "[2/5] Admin types and tests"
 cd "$repo_dir/admin-web"
 "$pnpm_cmd" run typecheck
 "$pnpm_cmd" run test
 
-echo "[3/4] Mobile types and dependency compatibility"
+echo "[3/5] Mobile types and dependency compatibility"
 cd "$repo_dir/mobile"
 "$pnpm_cmd" run typecheck
 "$pnpm_cmd" run doctor
 
-echo "[4/4] Repository safety and workflow validation"
+echo "[4/5] Governance evidence and browser syntax"
+cd "$repo_dir/governance-data"
+"$ci_venv/bin/python" -m unittest -v test_server.py
+"$node_cmd" --check "$repo_dir/governance-web/app.js"
+
+echo "[5/5] Repository safety and workflow validation"
 cd "$repo_dir"
 "$ci_venv/bin/python" -c 'import pathlib,yaml; yaml.safe_load(pathlib.Path(".github/workflows/ci.yml").read_text())'
 git diff --check

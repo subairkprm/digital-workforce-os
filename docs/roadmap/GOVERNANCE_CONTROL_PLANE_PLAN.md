@@ -62,18 +62,24 @@ avoids the admin development server and existing infrastructure ports.
 flowchart TB
     Browser[Local browser]
     Gov[governance-web\nunprivileged static service\nlocalhost:3100]
+    Evidence[governance-data\nread-only whitelisted parser\ninternal only]
+    Docs[Canonical repository docs\nread-only mounts]
     Admin[admin-web development\nlocalhost:3000]
     API[FastAPI\nlocalhost:8000]
     DB[(PostgreSQL\nlocalhost:5432)]
     Redis[(Redis\nlocalhost:6379)]
 
     Browser -->|read static project evidence| Gov
+    Browser -->|poll normalized evidence| Gov --> Evidence --> Docs
     Browser --> Admin --> API
     API --> DB
     API --> Redis
     Gov -. no runtime connection .-x API
     Gov -. no runtime connection .-x DB
     Gov -. no runtime connection .-x Redis
+    Evidence -. no credentials or network path .-x API
+    Evidence -. no runtime connection .-x DB
+    Evidence -. no runtime connection .-x Redis
 ```
 
 ## Governance record model
@@ -149,6 +155,8 @@ flowchart LR
 |---|---|---|---|
 | GOV 0.1 | Local read-only dashboard template | No credentials, APIs, persistence, or mutations | Docker/local validation |
 | GOV 0.2 | Trusted document and GitHub read ingestion | Read-only token, minimal scopes, signed inputs | Data accuracy and threat review |
+| GOV 0.2A | Live local document ingestion | Whitelisted read-only mounts, no credential or external network | Parser, freshness and isolation evidence |
+| GOV 0.2B | GitHub PR/check read ingestion | Read-only token, minimal scopes, server-side adapter | Permission, data accuracy and threat review |
 | GOV 0.3 | Authenticated role-based review workspace | MFA, least privilege, audit, no self-approval | Independent security/QA acceptance |
 | GOV 0.4 | Requirements, defects, risks, deviations, waivers | Immutable history and expiring waivers | Traceability and conflict-of-interest tests |
 | GOV 0.5 | CI status/check integration | Signed webhooks; no false remote-pass representation | Remote CI and branch protection active |
@@ -178,3 +186,7 @@ are exposed; a provider/legal dependency is unapproved; or critical/high risk re
 Accept GOV 0.1 as a local UI template only. Before GOV 0.2, approve the ingestion architecture,
 GitHub permission scopes, source reconciliation rules, data classification, authentication/RBAC,
 audit model, and an explicit rule that the control plane cannot merge or deploy.
+Review GOV 0.2A as a credential-free local live-evidence reader. Before GOV 0.2B, approve GitHub
+permission scopes, source reconciliation rules, data classification, credential storage and
+rotation, rate/failure handling, audit model, and an explicit rule that the control plane cannot
+merge or deploy.

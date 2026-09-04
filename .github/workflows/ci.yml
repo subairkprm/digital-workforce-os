@@ -86,6 +86,21 @@ jobs:
       - run: pnpm run doctor
       - run: pnpm audit --audit-level high
 
+  governance-control-plane:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: python -m unittest -v test_server.py
+        working-directory: governance-data
+      - run: node --check governance-web/app.js
+      - run: docker compose config --quiet
+
   docker:
     runs-on: ubuntu-latest
     steps:

@@ -3,6 +3,9 @@ services:
     build: ./governance-web
     ports:
       - "${DWCO_GOVERNANCE_PORT:-3100}:8080"
+    depends_on:
+      governance-data:
+        condition: service_healthy
     read_only: true
     tmpfs:
       - /var/cache/nginx
@@ -10,6 +13,31 @@ services:
       - /tmp
     security_opt:
       - no-new-privileges:true
+    networks:
+      - governance_ingress
+      - governance_data_plane
+
+  governance-data:
+    build: ./governance-data
+    environment:
+      DWCO_GOVERNANCE_EVIDENCE_ROOT: /evidence
+    volumes:
+      - ./PROJECT_STATUS.md:/evidence/PROJECT_STATUS.md:ro
+      - ./MASTER_PROJECT_PLAN.md:/evidence/MASTER_PROJECT_PLAN.md:ro
+      - ./DEPENDENCY_REGISTER.md:/evidence/DEPENDENCY_REGISTER.md:ro
+      - ./docs/reviews:/evidence/reviews:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - governance_data_plane
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/healthz', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   api:
     build: ./backend
@@ -18,7 +46,7 @@ services:
       DWCO_REDIS_URL: redis://redis:6379/0
       DWCO_JWT_SECRET: local-compose-secret-change-before-any-shared-use
     ports:
-      - "8000:8000"
+      - "${DWCO_API_PORT:-8000}:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,7 +60,7 @@ services:
       POSTGRES_USER: dwco
       POSTGRES_PASSWORD: dwco
     ports:
-      - "5432:5432"
+      - "${DWCO_POSTGRES_PORT:-5432}:5432"
     volumes:
       - dwco_postgres:/var/lib/postgresql/data
     healthcheck:
@@ -44,7 +72,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "${DWCO_REDIS_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -53,3 +81,8 @@ services:
 
 volumes:
   dwco_postgres:
+
+networks:
+  governance_ingress:
+  governance_data_plane:
+    internal: true

@@ -26,6 +26,9 @@ repository or production control.
 - Any future live integration requires authentication, RBAC, audit, signed webhook/API ingestion,
   data minimisation, and a separate approved contract.
 
+Credential-free local document refresh is separately bounded by
+`DWCO-GOV-0.2A-LOCAL-LIVE-EVIDENCE.md`; it does not authorize GitHub or production integration.
+
 ## Explicitly deferred
 
 - Persistent governance records, live GitHub synchronization, webhooks, and status checks.
@@ -41,3 +44,4 @@ repository or production control.
 - Existing application behavior remains unchanged.
 
 DEPLOYMENT_STATUS=LOCAL_ONLY_NOT_AUTHORIZED_FOR_PRODUCTION
+DEPLOYMENT_STATUL=LOCAL_ONLY_NOT_AUTHORIZED_FOR_PRODUCTION
