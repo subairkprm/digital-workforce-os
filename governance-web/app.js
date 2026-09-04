@@ -12,4 +12,5 @@ buttons.forEach((button) => {
     views.forEach((view) => {
       view.hidden = view.dataset.view !== target;
     });
+  });
 });
