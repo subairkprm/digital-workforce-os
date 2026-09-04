@@ -67,6 +67,7 @@ class EmployeePatch(BaseModel):
 
 class EmployeeOut(ORMModel):
     id: str
+    user_id: Optional[str]
     employee_number: str
     full_name: str
     work_email: EmailStr
@@ -93,6 +94,60 @@ class PresenceOut(BaseModel):
     status: PresenceStatus
     last_seen_at: Optional[datetime]
     expires_at: Optional[datetime]
+
+
+class DirectConversationCreate(BaseModel):
+    participant_user_id: str = Field(min_length=36, max_length=36)
+
+
+class ConversationOut(BaseModel):
+    id: str
+    participant_user_ids: list[str]
+    peer_user_id: str
+    last_message_at: Optional[datetime]
+    created_at: datetime
+
+
+class MessageCreate(BaseModel):
+    client_message_id: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9._:-]+$")
+    body: str = Field(min_length=1, max_length=4000)
+
+
+class MessageOut(BaseModel):
+    id: str
+    conversation_id: str
+    sender_user_id: str
+    client_message_id: str
+    sequence_number: int
+    body: Optional[str]
+    created_at: datetime
+    expires_at: datetime
+    deleted_at: Optional[datetime]
+    read_by_user_ids: list[str]
+
+
+class MessageReceiptOut(BaseModel):
+    message_id: str
+    user_id: str
+    read_at: datetime
+
+
+class RealtimeTicketOut(BaseModel):
+    ticket: str
+    expires_in_seconds: int
+    websocket_path: str = "/api/v1/realtime/ws"
+
+
+class MessagingMetricsOut(BaseModel):
+    conversation_count: int
+    active_message_count: int
+    expired_message_count: int
+    oldest_active_message_at: Optional[datetime]
+    newest_message_at: Optional[datetime]
+
+
+class RetentionPurgeOut(BaseModel):
+    purged_messages: int
 
 
 class AuditOut(ORMModel):

@@ -28,7 +28,7 @@ integrations, and communication intelligence.
 | DWCO 0.1 | Foundation, tenancy, identity, core RBAC | 12% | Complete |
 | DWCO 0.2 | Admin and security closure | 10% | Complete |
 | DWCO 0.3 | Workforce operations | 12% | Complete |
-| DWCO 0.4 | Realtime presence and messaging | 14% | Next/planned; draft contract |
+| DWCO 0.4 | Realtime presence and messaging | 14% | Local implementation complete; review/merge pending |
 | DWCO 0.5 | App-to-app voice/WebRTC | 12% | Not started |
 | DWCO 0.6 | Telecom/PSTN/PBX provider integration | 12% | Not started |
 | DWCO 0.7 | Mobility/eSIM provider integration | 8% | Not started |
@@ -43,8 +43,9 @@ gate in `docs/roadmap/COMPLETION_MODEL.md`.
 ## Current checkpoint
 
 DWCO 0.1, 0.2, and 0.3 are complete and accepted. A bounded DWCO 0.4 presence capability has also
-been merged and locally validated, but the complete realtime-communication stage has not been
-approved or accepted. Overall accepted completion therefore remains approximately 34%.
+been merged and locally validated. The complete realtime-communication contract is approved and its
+bounded local implementation and completion evidence are ready for review, but have not been
+accepted or merged. Overall accepted completion therefore remains approximately 34%.
 
 Remote GitHub Actions is unresolved because workflows fail to start under the repository account
 condition documented in `docs/LOCAL_CI_FALLBACK.md`. Enforced local gates exist but do not replace
@@ -61,10 +62,10 @@ remote CI or branch protection.
 
 ## Next approval gate
 
-Approve, amend, or reject the draft DWCO 0.4 realtime communication contract. Approval must lock
+Review the bounded DWCO 0.4 implementation evidence against its approved contract, including
 transport choice, messaging semantics, data/retention rules, tenancy and authorization invariants,
-mobile/background behavior, observability, abuse limits, migrations, tests, and rollback. It must
-also state whether remote CI restoration is a hard prerequisite for implementation or merge.
+mobile/background behavior, observability, abuse limits, migrations, tests, and rollback. Merge is
+a separate explicit repository decision while remote CI remains blocked.
 
 ## Explicit non-authorization
 

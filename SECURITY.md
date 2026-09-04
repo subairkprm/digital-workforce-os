@@ -32,6 +32,8 @@
 - Redis stores only short-lived counters; it does not store credentials or tokens.
 - A Redis outage fails open in this local foundation to preserve application availability. Readiness
   still reports Redis failure, and production behavior must be separately reviewed before deployment.
+- Realtime connection-ticket issuance fails closed when Redis is unavailable. Tickets are one-time,
+  stored only under a SHA-256-derived key, expire after 60 seconds, and never appear in logs.
 
 ## Security events
 
@@ -54,5 +56,19 @@ Presence identity and tenant scope are derived exclusively from the authenticate
 Clients can update only their own status, while directory presence requires `employee.read` (or
 `tenant.owner`). Heartbeats expire after 120 seconds and are reported as offline after expiry.
 Presence mutations are rate-limited and intentionally excluded from administrative audit events to
-avoid storing high-volume activity trails. Production retention, realtime transport, and analytics
-require separate authorization and privacy review.
+avoid storing high-volume activity trails. Live presence events are delivered only to the actor or a
+tenant member with directory visibility.
+
+## Workforce messaging
+
+- Conversation and message access requires active participation in the server-derived tenant.
+- Direct conversations contain exactly two active same-tenant members; no group, guest, public, or
+  federated channel exists in this contract.
+- Accepted messages are persisted before best-effort fan-out, receive a monotonic conversation
+  sequence, and use a sender idempotency key. History is capped at 100 records per request.
+- Bodies are limited to 4,000 characters. Attachments and tenant-wide content export are disabled.
+- Messages expire after 90 days, are hidden after expiry, and may be purged only by an authorized,
+  audited tenant maintenance action. Senders may redact only their own content.
+- Administrators receive aggregate counts and timestamps only; no administrative message-content
+  endpoint exists. Logs, audit events, security events, notification adapters, and metrics exclude
+  message bodies, raw tickets, and credentials.

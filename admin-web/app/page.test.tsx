@@ -54,6 +54,23 @@ describe("AdminShell", () => {
     expect(screen.getByText(/available/)).toBeInTheDocument();
   });
 
+  it("shows aggregate messaging metadata without exposing content", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ access_token: "access", refresh_token: "refresh" }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ email: "admin@example.com", tenant_id: "tenant-a", permissions: ["message.metadata.read"] }) })
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ conversation_count: 3, active_message_count: 12, expired_message_count: 2 }) });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<AdminShell />);
+    fireEvent.change(screen.getByLabelText("Tenant ID"), { target: { value: "tenant-a" } });
+    fireEvent.change(screen.getByLabelText("Work email"), { target: { value: "admin@example.com" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct-password" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Messaging" }));
+    expect(await screen.findByText("Messaging metadata")).toBeInTheDocument();
+    expect(screen.getByText("12")).toBeInTheDocument();
+    expect(screen.getByText(/cannot view message content/i)).toBeInTheDocument();
+  });
+
   it("shows workforce operations only when authorized", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ access_token: "access", refresh_token: "refresh" }) })

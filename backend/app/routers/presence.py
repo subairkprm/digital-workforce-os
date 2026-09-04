@@ -12,6 +12,7 @@ from app.database import get_db
 from app.dependencies import Context, RequestContext, require_permission
 from app.models import Employee, Presence, utcnow
 from app.rate_limit import enforce_rate_limit
+from app.realtime import realtime_hub
 from app.schemas import PresenceHeartbeat, PresenceOut, PresenceStatus, PresenceUpdate
 
 router = APIRouter(prefix="/presence", tags=["presence"])
@@ -108,7 +109,7 @@ def get_my_presence(
 
 
 @router.put("/me", response_model=PresenceOut)
-def set_my_presence(
+async def set_my_presence(
     payload: PresenceUpdate,
     db: Annotated[Session, Depends(get_db)],
     context: Context,
@@ -119,15 +120,22 @@ def set_my_presence(
         get_settings().mutation_rate_limit,
     )
     presence = _upsert(db, context, payload.status)
-    return _output(
+    output = _output(
         presence,
         _employee_for_user(db, context.tenant_id, context.user.id),
         utcnow(),
     )
+    await realtime_hub.publish_tenant(
+        context.tenant_id,
+        {"type": "presence.updated", "presence": output.model_dump(mode="json")},
+        permission="employee.read",
+        include_user_ids={context.user.id},
+    )
+    return output
 
 
 @router.post("/me/heartbeat", response_model=PresenceOut)
-def heartbeat(
+async def heartbeat(
     payload: PresenceHeartbeat,
     db: Annotated[Session, Depends(get_db)],
     context: Context,
@@ -149,11 +157,18 @@ def heartbeat(
         else "available"
     )
     presence = _upsert(db, context, status)
-    return _output(
+    output = _output(
         presence,
         _employee_for_user(db, context.tenant_id, context.user.id),
         utcnow(),
     )
+    await realtime_hub.publish_tenant(
+        context.tenant_id,
+        {"type": "presence.updated", "presence": output.model_dump(mode="json")},
+        permission="employee.read",
+        include_user_ids={context.user.id},
+    )
+    return output
 
 
 @router.get("", response_model=list[PresenceOut])
