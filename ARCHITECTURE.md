@@ -41,12 +41,29 @@ Tenant identity must be derived from authenticated server-side context, never tr
 - employee
 - department
 - presence
+- conversation
+- conversation_participant
+- message
+- message_receipt
 - role
 - permission
 - extension
 - device
 - session
 - audit_event
+
+## Realtime and messaging boundary
+
+- Authenticated HTTP owns durable commands, ordered history, idempotency, receipts, redaction, and
+  retention maintenance.
+- WebSocket carries best-effort live events after a one-time Redis ticket is consumed and active
+  tenant membership is revalidated.
+- PostgreSQL is the message authority. A missed live event is recovered with sequence-based history;
+  WebSocket delivery is not claimed to be exactly once.
+- The local fan-out hub is process-local. A reviewed shared-broker adapter and deployment contract
+  are required before multi-instance or production operation.
+- The notification adapter receives identifiers only. The current local adapter sends nothing and
+  stores no provider credentials.
 
 ## Environment model
 LOCAL -> DEV -> STAGING -> PRODUCTION

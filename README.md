@@ -20,9 +20,9 @@ External PSTN, eSIM provisioning, AI, recording and advanced PBX are explicitly 
 
 The Phase 1 monorepo contains:
 
-- `backend/` — FastAPI, SQLAlchemy, Alembic, Redis readiness and security tests
-- `admin-web/` — authenticated Next.js administration shell
-- `mobile/` — Expo/React Native login, profile/directory shell and secure token storage
+- `backend/` — FastAPI, SQLAlchemy, Alembic, Redis-backed realtime tickets and security tests
+- `admin-web/` — authenticated Next.js administration and messaging-metadata shell
+- `mobile/` — Expo/React Native login, directory, presence, direct messaging and secure token storage
 
 Start the local API, PostgreSQL and Redis services:
 
@@ -42,6 +42,11 @@ docker compose exec api python -m app.bootstrap \
 The tenant ID returned from the database/bootstrap context is sent as `X-Tenant-ID` on
 authenticated tenant API requests. A client-provided tenant ID is never accepted in resource
 payloads as authorization context.
+
+DWCO 0.4 adds local direct messaging through authenticated HTTP plus best-effort WebSocket events.
+Clients obtain a one-time 60-second connection ticket from `POST /api/v1/realtime/tickets`; access
+and refresh tokens are never placed in the WebSocket URL. Durable catch-up uses bounded, ordered
+message history. This local implementation is single-process and is not authorized for production.
 
 Run backend quality gates with `make backend-check backend-test`. Migration rollback is
 `cd backend && alembic downgrade base`; this is destructive and intended only for disposable local

@@ -29,6 +29,32 @@ fi
 ci_venv="$repo_dir/backend/.ci-venv"
 compose_started=0
 
+run_pnpm_audit() {
+  audit_attempt=1
+  while ! npm_config_fetch_retries=0 "$pnpm_cmd" audit --audit-level high; do
+    if [ "$audit_attempt" -ge 3 ]; then
+      echo "Dependency audit registry remained unavailable after 3 attempts"
+      return 1
+    fi
+    audit_attempt=$((audit_attempt + 1))
+    echo "Dependency audit registry unavailable; retrying ($audit_attempt/3)"
+    sleep 5
+  done
+}
+
+run_python_audit() {
+  audit_attempt=1
+  while ! "$ci_venv/bin/python" -m pip_audit --skip-editable --timeout 60; do
+    if [ "$audit_attempt" -ge 3 ]; then
+      echo "Python dependency audit service remained unavailable after 3 attempts"
+      return 1
+    fi
+    audit_attempt=$((audit_attempt + 1))
+    echo "Python dependency audit service unavailable; retrying ($audit_attempt/3)"
+    sleep 5
+  done
+}
+
 cleanup() {
   if [ "$compose_started" -eq 1 ]; then
     "$docker_cmd" compose -f "$repo_dir/docker-compose.yml" --project-directory "$repo_dir" down -v
@@ -49,7 +75,7 @@ cd "$repo_dir/backend"
 "$ci_venv/bin/python" -m ruff format --check .
 "$ci_venv/bin/python" -m mypy app
 "$ci_venv/bin/python" -m pytest --cov=app --cov-report=term-missing
-"$ci_venv/bin/python" -m pip_audit --skip-editable
+run_python_audit
 
 echo "[3/7] Alembic upgrade and downgrade"
 ci_tmp_dir=$(mktemp -d)
@@ -66,14 +92,14 @@ cd "$repo_dir/admin-web"
 "$pnpm_cmd" run typecheck
 "$pnpm_cmd" run test
 "$pnpm_cmd" run build
-"$pnpm_cmd" audit --audit-level high
+run_pnpm_audit
 
 echo "[5/7] Mobile install, types, dependency check and audit"
 cd "$repo_dir/mobile"
 "$pnpm_cmd" install --frozen-lockfile
 "$pnpm_cmd" run typecheck
 "$pnpm_cmd" run doctor
-"$pnpm_cmd" audit --audit-level high
+run_pnpm_audit
 
 echo "[6/7] Repository and workflow validation"
 cd "$repo_dir"
@@ -99,7 +125,7 @@ until curl --silent --show-error --fail http://localhost:8000/readyz >/dev/null;
 done
 curl --silent --show-error --fail http://localhost:8000/health >/dev/null
 curl --silent --show-error --fail http://localhost:8000/livez >/dev/null
-test "$("$docker_cmd" compose exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0004_presence"
+test "$("$docker_cmd" compose exec -T postgres psql -U dwco -d dwco -tAc 'select version_num from alembic_version;')" = "0005_realtime_messaging"
 test "$("$docker_cmd" compose exec -T redis redis-cli ping)" = "PONG"
 
 echo "LOCAL_CI=PASS"

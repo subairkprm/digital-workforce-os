@@ -10,10 +10,15 @@
 - Tenant-scoped presence status, polling, heartbeat expiry, directory visibility, admin read access,
   and mobile controls under `DWCO-0.4-PRESENCE`.
 
-## Next proposed boundary
+## Approved implementation boundary
 
-DWCO 0.4 realtime communication may cover secure realtime presence transport and tenant messaging
-only after approval of its draft contract. The draft does not itself authorize implementation.
+DWCO 0.4 realtime communication is approved for bounded local implementation and review. It covers
+one-time authenticated realtime connections, live presence events, direct same-tenant messaging,
+durable bounded history, explicit receipts, sender redaction, retention maintenance, a no-op
+provider-neutral notification boundary, metadata-only administration, tests, and local verification.
+
+Approval does not authorize merge, shared-environment operation, or production deployment. The
+process-local fan-out implementation must not be represented as production multi-instance realtime.
 
 ## Explicitly outside the next boundary
 
