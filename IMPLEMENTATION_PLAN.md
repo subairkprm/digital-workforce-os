@@ -15,12 +15,13 @@ status authority. This file preserves the implementation-epic view and must not 
 | DWCO-006 | RBAC | Complete | DWCO 0.1/0.2 tests and reports |
 | DWCO-007 | Audit events | Complete | DWCO 0.1/0.2 implementation and reports |
 | DWCO-008 | Admin shell | Complete | DWCO 0.1/0.2 implementation and reports |
-| DWCO-009 | Remote CI authority | Blocked externally | GitHub Actions startup failure; local fallback active |
+| DWCO-009 | Remote CI authority | Blocked externally | GitHub Actions startup failure; exact-commit local receipt is an active mitigation |
 | DWCO-010 | Security baseline | Complete | `SECURITY.md` and DWCO 0.2 report |
 
 The former statement that DWCO-007, DWCO-008, and DWCO-010 were open implementation gaps was
 stale and is superseded by merged implementation evidence. DWCO-009 remains unresolved: local
-quality gates are passing evidence, but they are not GitHub-attested CI.
+quality gates and exact-commit receipts are trusted-machine evidence, but they are not
+GitHub-attested CI.
 
 ## Accepted stages
 

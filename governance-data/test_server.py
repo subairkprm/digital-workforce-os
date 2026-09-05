@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from server import GovernanceServer, build_snapshot
+from server import GovernanceServer, build_snapshot, load_local_ci_receipt
 
 PROJECT_STATUS = """\
 STATUS_AS_OF=2026-09-04
@@ -58,6 +58,33 @@ Residual risks are explicit:
 - Realtime hub is process-local.
 """
 
+VALID_RECEIPT = {
+    "schemaVersion": 1,
+    "result": "PASS",
+    "sourceCommit": "a" * 40,
+    "finalCommit": "a" * 40,
+    "sourceBranch": "chore/local-ci-product-readiness",
+    "startedAt": "2026-09-05T10:00:00Z",
+    "completedAt": "2026-09-05T10:03:00Z",
+    "durationSeconds": 180,
+    "gateExitCode": 0,
+    "workflowSha256": "b" * 64,
+    "gateScriptSha256": "c" * 64,
+    "worktreeClean": True,
+    "scope": "TRUSTED_LOCAL_MACHINE_ONLY",
+    "remoteCiStatus": "UNAVAILABLE_NOT_ATTESTED",
+    "deploymentStatus": "NOT_AUTHORIZED_NOT_DEPLOYED",
+    "note": "Complete local parity gate passed; this is not GitHub-hosted attestation.",
+    "runner": {
+        "os": "Darwin",
+        "arch": "arm64",
+        "python": "3.12.14",
+        "node": "26.8.1",
+        "pnpm": "11.19.0",
+        "docker": "29.7.2",
+    },
+}
+
 
 class SnapshotTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -101,8 +128,38 @@ class SnapshotTests(unittest.TestCase):
 
         self.assertNotEqual(first, second)
 
+    def test_local_ci_receipt_is_sanitized_and_changes_digest(self) -> None:
+        receipt_path = self.root / "latest.json"
+        without_receipt = build_snapshot(self.root, receipt_path)
+        self.assertEqual(without_receipt["localCi"]["result"], "NOT_RUN")
+
+        receipt_path.write_text(json.dumps(VALID_RECEIPT), encoding="utf-8")
+        with_receipt = build_snapshot(self.root, receipt_path)
+        self.assertEqual(with_receipt["localCi"]["result"], "PASS")
+        self.assertEqual(with_receipt["localCi"]["sourceCommit"], "a" * 40)
+        self.assertNotEqual(
+            without_receipt["meta"]["contentDigest"],
+            with_receipt["meta"]["contentDigest"],
+        )
+
+    def test_invalid_local_ci_receipt_fails_closed_without_breaking_snapshot(self) -> None:
+        receipt_path = self.root / "latest.json"
+        invalid = dict(VALID_RECEIPT)
+        invalid["scope"] = "PUBLIC_ATTESTATION"
+        invalid["secret"] = "must-not-pass-through"
+        receipt_path.write_text(json.dumps(invalid), encoding="utf-8")
+
+        receipt = load_local_ci_receipt(receipt_path)
+        snapshot = build_snapshot(self.root, receipt_path)
+
+        self.assertEqual(receipt["result"], "INVALID")
+        self.assertNotIn("secret", snapshot["localCi"])
+        self.assertEqual(snapshot["metrics"]["acceptedCompletion"], 34)
+
     def test_http_api_and_head_are_read_only_and_uncached(self) -> None:
-        server = GovernanceServer(("127.0.0.1", 0), self.root)
+        receipt_path = self.root / "latest.json"
+        receipt_path.write_text(json.dumps(VALID_RECEIPT), encoding="utf-8")
+        server = GovernanceServer(("127.0.0.1", 0), self.root, receipt_path)
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
         try:
@@ -111,6 +168,7 @@ class SnapshotTests(unittest.TestCase):
                 payload = json.load(response)
                 self.assertEqual(response.headers["Cache-Control"], "no-store")
                 self.assertEqual(payload["metrics"]["acceptedCompletion"], 34)
+                self.assertEqual(payload["localCi"]["result"], "PASS")
             request = Request(f"{base_url}/api/governance", method="HEAD")
             with urlopen(request, timeout=2) as response:
                 self.assertEqual(response.status, 200)

@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_EVIDENCE_ROOT = Path("/evidence")
+DEFAULT_LOCAL_CI_RECEIPT = Path("/local-ci/latest.json")
+MAX_LOCAL_CI_RECEIPT_BYTES = 16 * 1024
 EVIDENCE_FILES = {
     "project_status": Path("PROJECT_STATUS.md"),
     "master_plan": Path("MASTER_PROJECT_PLAN.md"),
@@ -130,8 +132,107 @@ def classify_exception(risk: str) -> tuple[str, str, str]:
     return "medium", "Implementation Director", "Open evidence exception"
 
 
-def build_snapshot(root: Path) -> dict[str, Any]:
+def unavailable_local_ci(result: str, note: str) -> dict[str, Any]:
+    return {
+        "schemaVersion": 1,
+        "result": result,
+        "sourceCommit": None,
+        "sourceBranch": None,
+        "startedAt": None,
+        "completedAt": None,
+        "durationSeconds": None,
+        "gateExitCode": None,
+        "workflowSha256": None,
+        "gateScriptSha256": None,
+        "worktreeClean": None,
+        "scope": "TRUSTED_LOCAL_MACHINE_ONLY",
+        "remoteCiStatus": "UNAVAILABLE_NOT_ATTESTED",
+        "deploymentStatus": "NOT_AUTHORIZED_NOT_DEPLOYED",
+        "note": note,
+        "runner": {},
+    }
+
+
+def load_local_ci_receipt(path: Path | None) -> dict[str, Any]:
+    if path is None or not path.exists():
+        return unavailable_local_ci("NOT_RUN", "No local CI receipt is available.")
+    try:
+        if path.stat().st_size > MAX_LOCAL_CI_RECEIPT_BYTES:
+            raise ValueError("Receipt is too large")
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(receipt, dict):
+            raise ValueError("Receipt must be an object")
+        required_exact = {
+            "scope": "TRUSTED_LOCAL_MACHINE_ONLY",
+            "remoteCiStatus": "UNAVAILABLE_NOT_ATTESTED",
+            "deploymentStatus": "NOT_AUTHORIZED_NOT_DEPLOYED",
+        }
+        if receipt.get("schemaVersion") != 1:
+            raise ValueError("Unsupported receipt schema")
+        if receipt.get("result") not in {"PASS", "FAIL"}:
+            raise ValueError("Invalid result")
+        if any(receipt.get(key) != value for key, value in required_exact.items()):
+            raise ValueError("Invalid receipt boundary")
+        for field in ("sourceCommit", "finalCommit"):
+            if not re.fullmatch(r"[0-9a-f]{40}", str(receipt.get(field, ""))):
+                raise ValueError(f"Invalid {field}")
+        for field in ("workflowSha256", "gateScriptSha256"):
+            if not re.fullmatch(r"[0-9a-f]{64}", str(receipt.get(field, ""))):
+                raise ValueError(f"Invalid {field}")
+        if not isinstance(receipt.get("worktreeClean"), bool):
+            raise ValueError("Invalid worktreeClean")
+        for field in ("durationSeconds", "gateExitCode"):
+            if not isinstance(receipt.get(field), int) or receipt[field] < 0:
+                raise ValueError(f"Invalid {field}")
+        runner = receipt.get("runner")
+        if not isinstance(runner, dict):
+            raise ValueError("Invalid runner")
+        bounded_fields = (
+            "sourceBranch",
+            "startedAt",
+            "completedAt",
+            "note",
+        )
+        if any(
+            not isinstance(receipt.get(field), str) or len(receipt[field]) > 256
+            for field in bounded_fields
+        ):
+            raise ValueError("Invalid receipt text")
+        allowed_runner = {"os", "arch", "python", "node", "pnpm", "docker"}
+        if set(runner) - allowed_runner or any(
+            not isinstance(value, str) or len(value) > 128 for value in runner.values()
+        ):
+            raise ValueError("Invalid runner values")
+        return {
+            key: receipt[key]
+            for key in (
+                "schemaVersion",
+                "result",
+                "sourceCommit",
+                "sourceBranch",
+                "startedAt",
+                "completedAt",
+                "durationSeconds",
+                "gateExitCode",
+                "workflowSha256",
+                "gateScriptSha256",
+                "worktreeClean",
+                "scope",
+                "remoteCiStatus",
+                "deploymentStatus",
+                "note",
+                "runner",
+            )
+        }
+    except (OSError, ValueError, json.JSONDecodeError, KeyError, TypeError):
+        return unavailable_local_ci(
+            "INVALID", "The local CI receipt is malformed or outside its trust boundary."
+        )
+
+
+def build_snapshot(root: Path, local_ci_receipt: Path | None = None) -> dict[str, Any]:
     documents = read_evidence(root)
+    local_ci = load_local_ci_receipt(local_ci_receipt)
     project = parse_assignments(documents["project_status"])
     review = parse_assignments(documents["acceptance_review"])
     stages = parse_table(section(documents["master_plan"], "Stage map and weight"))
@@ -174,9 +275,9 @@ def build_snapshot(root: Path) -> dict[str, Any]:
             for term in ("blocked", "pending", "deferred")
         )
     ]
-    digest = hashlib.sha256(
-        "\n".join(documents[name] for name in sorted(documents)).encode("utf-8")
-    ).hexdigest()[:12]
+    digest_input = "\n".join(documents[name] for name in sorted(documents))
+    digest_input += "\n" + json.dumps(local_ci, sort_keys=True, separators=(",", ":"))
+    digest = hashlib.sha256(digest_input.encode("utf-8")).hexdigest()[:12]
 
     return {
         "meta": {
@@ -220,6 +321,7 @@ def build_snapshot(root: Path) -> dict[str, Any]:
             section(documents["project_status"], "Verification status")
         ),
         "blockingDependencies": blocking_dependencies,
+        "localCi": local_ci,
     }
 
 
@@ -252,7 +354,9 @@ class GovernanceHandler(BaseHTTPRequestHandler):
             return
         if self.path == "/api/governance":
             try:
-                snapshot = build_snapshot(self.server.evidence_root)  # type: ignore[attr-defined]
+                snapshot = build_snapshot(  # type: ignore[attr-defined]
+                    self.server.evidence_root, self.server.local_ci_receipt
+                )
             except (OSError, ValueError):
                 self.send_json(
                     HTTPStatus.SERVICE_UNAVAILABLE,
@@ -277,7 +381,9 @@ class GovernanceHandler(BaseHTTPRequestHandler):
             self.send_json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
             return
         try:
-            snapshot = build_snapshot(self.server.evidence_root)  # type: ignore[attr-defined]
+            snapshot = build_snapshot(  # type: ignore[attr-defined]
+                self.server.evidence_root, self.server.local_ci_receipt
+            )
         except (OSError, ValueError) as error:
             self.log_error("Evidence snapshot failed: %s", type(error).__name__)
             self.send_json(
@@ -288,15 +394,24 @@ class GovernanceHandler(BaseHTTPRequestHandler):
 
 
 class GovernanceServer(ThreadingHTTPServer):
-    def __init__(self, address: tuple[str, int], evidence_root: Path):
+    def __init__(
+        self,
+        address: tuple[str, int],
+        evidence_root: Path,
+        local_ci_receipt: Path | None = None,
+    ):
         self.evidence_root = evidence_root
+        self.local_ci_receipt = local_ci_receipt
         super().__init__(address, GovernanceHandler)
 
 
 def main() -> None:
     root = Path(os.environ.get("DWCO_GOVERNANCE_EVIDENCE_ROOT", DEFAULT_EVIDENCE_ROOT))
+    local_ci_receipt = Path(
+        os.environ.get("DWCO_LOCAL_CI_RECEIPT", DEFAULT_LOCAL_CI_RECEIPT)
+    )
     port = int(os.environ.get("DWCO_GOVERNANCE_DATA_PORT", "8081"))
-    GovernanceServer(("0.0.0.0", port), root).serve_forever()
+    GovernanceServer(("0.0.0.0", port), root, local_ci_receipt).serve_forever()
 
 
 if __name__ == "__main__":
