@@ -3,10 +3,16 @@ set -eu
 
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 ci_venv="$repo_dir/backend/.ci-venv"
+dwco_runtime_deps=${CODEX_RUNTIME_DEPS:-}
+dwco_user_bin=${XDG_BIN_HOME:-}
+if [ -n "${HOME:-}" ]; then
+  [ -n "$dwco_runtime_deps" ] || dwco_runtime_deps="${XDG_CACHE_HOME:-$HOME/.cache}/codex-runtimes/codex-primary-runtime/dependencies"
+  [ -n "$dwco_user_bin" ] || dwco_user_bin="$HOME/.local/bin"
+fi
 
 if [ -n "${NODE_BIN:-}" ]; then node_cmd=$NODE_BIN
 elif command -v node >/dev/null 2>&1; then node_cmd=$(command -v node)
-elif [ -x /Users/subair/.local/bin/node ]; then node_cmd=/Users/subair/.local/bin/node
+elif [ -n "$dwco_user_bin" ] && [ -x "$dwco_user_bin/node" ]; then node_cmd="$dwco_user_bin/node"
 else echo "Node.js is required"; exit 1
 fi
 PATH=$(dirname "$node_cmd"):$PATH
@@ -16,8 +22,8 @@ if [ -n "${PNPM_BIN:-}" ]; then
   pnpm_cmd=$PNPM_BIN
 elif command -v pnpm >/dev/null 2>&1; then
   pnpm_cmd=pnpm
-elif [ -x /Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm ]; then
-  pnpm_cmd=/Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm
+elif [ -n "$dwco_runtime_deps" ] && [ -x "$dwco_runtime_deps/bin/fallback/pnpm" ]; then
+  pnpm_cmd="$dwco_runtime_deps/bin/fallback/pnpm"
 else
   echo "pnpm is required; run make ci-local once to prepare this checkout"
   exit 1

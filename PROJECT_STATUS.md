@@ -45,8 +45,8 @@ PRODUCTION_AUTHORIZED=NO
 - `main` is not protected; remediation was fast-forwarded directly and did not receive a GitHub PR
   review record. Independent agent review evidence is recorded in the repository.
 - `.githooks`, `scripts/ci-local-attest.sh`, and `docs/LOCAL_CI_FALLBACK.md` provide the local
-  exact-commit fallback. A clean-tree `PASS` receipt was produced for implementation commit
-  `93e2a3a`; every later commit requires its own matching receipt.
+  exact-commit fallback. The untracked clean-tree `PASS` receipt must match the current reviewed
+  commit; every later commit requires a newly generated matching receipt.
 - Local results are not a substitute for GitHub-attested required checks.
 - Product readiness is not yet confirmed: the repository is private/internal-development-only and
   legal, staging, production, later-stage, and release gates remain open.

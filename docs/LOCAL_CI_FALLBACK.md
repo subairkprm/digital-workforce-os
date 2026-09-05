@@ -5,6 +5,10 @@ account/workflow-startup limitation currently prevents usable runs. The local fa
 commits and pushes that fail the corresponding checks and can produce a sanitized, exact-commit
 receipt. It does not create a GitHub status check, replace branch protection, or authorize a release.
 
+The scripts resolve tools from `PATH`, then use portable per-user Codex runtime locations when
+available. Set `PYTHON_BIN`, `NODE_BIN`, `PNPM_BIN`, or `DOCKER_BIN` to explicit executables on a
+different workstation; `CODEX_RUNTIME_DEPS` may point to an alternate bundled dependency root.
+
 ## Fast developer gate
 
 ```sh
