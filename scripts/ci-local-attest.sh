@@ -19,6 +19,7 @@ else node_cmd=
 fi
 if [ -n "${PNPM_BIN:-}" ]; then pnpm_cmd=$PNPM_BIN
 elif command -v pnpm >/dev/null 2>&1; then pnpm_cmd=$(command -v pnpm)
+elif [ -x /Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm ]; then pnpm_cmd=/Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm
 else pnpm_cmd=
 fi
 if [ -n "${DOCKER_BIN:-}" ]; then docker_cmd=$DOCKER_BIN
