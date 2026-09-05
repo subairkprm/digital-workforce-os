@@ -1,6 +1,6 @@
 # DWCO 0.5 dependency and local runtime selection
 
-SELECTION_STATUS=CORRECTED_PROPOSAL_FOR_SECURITY_QA_DEVOPS_APPROVAL
+SELECTION_STATUS=TECHNICAL_DESIGN_REVIEWED_VBL_04_LICENSING_OPEN
 
 SELECTION_AS_OF=2026-09-05
 
@@ -10,8 +10,9 @@ DEPLOYMENT_AUTHORIZED=NO
 
 This record closes ambiguity about the candidate native WebRTC packages and local coturn artifact.
 It does not add dependencies, generate native projects, start a TURN service, authorize product code,
-or approve any shared or production environment. Required reviewers must accept this selection against
-an exact commit before VBL-04 or VBL-05 may close.
+or approve any shared or production environment. Reviewers accepted the corrected technical design
+at `1eb3140`; VBL-04 still requires the licensing decisions below, while the accepted VBL-05 runtime
+design still requires all executable evidence before merge.
 
 ## Repository baseline
 
@@ -32,7 +33,7 @@ Java/Android SDK and CocoaPods readiness must be established without changing th
 | Component | Exact proposal | Integrity and licence | Compatibility decision |
 |---|---|---|---|
 | WebRTC bridge | `react-native-webrtc@124.0.8` | npm integrity `sha512-uuQxvmk+mvnk5U0tr+1N42sKZqgm41fJrBA+fmCvML9J9P4roSh2So82t5RHAlu/vE9vxu5AKgivAiH61clCBg==`; MIT | Peer range accepts React Native `>=0.60.0`; native build and device proof still required |
-| WebRTC native configuration | Project-owned `mobile/plugins/withDwcoAudioWebRtc.js`; no additional runtime package | Repository-reviewed source under the project licence | Must allowlist only approved audio/network configuration and remove prohibited merged-library surfaces; clean prebuild/build proof is mandatory |
+| WebRTC native configuration | Project-owned `mobile/plugins/withDwcoAudioWebRtc.js`; no additional runtime package | Repository-owned source; no repository-wide licence is declared, so an explicit licensing decision is required | Must allowlist only approved audio/network configuration and remove prohibited merged-library surfaces; clean prebuild/build proof is mandatory |
 | Rejected plugin | `@config-plugins/react-native-webrtc@15.0.2` | npm integrity `sha512-sH4T7Z4P2RowV91k9CEwEr0unn+396NBexxCNZwRXuJXwguDU1qZWpE6fcwN0730B8uiS83F7+CLTyhpC7qRHQ==`; MIT | Rejected: it unconditionally adds camera, overlay, wake-lock, Bluetooth, and iOS camera-description entries outside this contract |
 
 The application must use an Expo development build. Expo Go is excluded because the selected bridge
@@ -49,6 +50,10 @@ screen sharing. No application code may expose video, screen capture, or `getDis
 prebuild assertion must inventory generated Android permissions, features, services, providers, and
 iOS usage descriptions/entitlements; any item outside the reviewed allowlist fails before compilation.
 Generated native directories remain disposable CNG output and must not become hand-edited authority.
+The selected bridge cannot be called licence-clean from top-level npm metadata alone: the installed
+package, embedded native binaries, and transitive notices must be inventoried and reviewed. The
+Implementation Director must obtain the appropriate legal/licensing decision for repository-owned
+source before VBL-04 closes or any distribution occurs; this document does not choose that licence.
 
 ### Supported build and device matrix
 
@@ -162,10 +167,10 @@ Primary references:
 | Reviewer | Required decision before closure |
 |---|---|
 | Mobile + Voice/WebRTC | Accept the bridge, project-owned minimal CNG plugin design, permissions, effective OS/toolchain matrix, development-build workflow, and physical-device evidence plan |
-| Identity/Security | Accept package licences, microphone-only permission boundary, digest pin, secret handling, credential TTL, relay-only policy, and residual upstream/supply-chain risk |
+| Identity/Security | Accept installed-package/native/transitive licences and notices, the repository licensing decision, microphone-only permission boundary, digest pin, secret handling, credential TTL, relay-only policy, and residual upstream/supply-chain risk |
 | QA/Validation | Accept the emulator/physical/cross-platform/audio-route matrix and define artifact ownership for every required result |
 | DevOps/SRE | Accept the multi-architecture digest, collision-free ports, isolation, hardening, resources, readiness, failure injection, and scoped cleanup plan |
 | Implementation Director | Accept the exact reviewed commit and separately authorize a bounded implementation branch |
 
-Until those decisions are recorded, `VBL-04=OPEN`, `VBL-05=OPEN`, `DEP-007=OPEN`, and
-`IMPLEMENTATION_AUTHORIZED=NO`.
+Current state is `VBL-04=OPEN`, `VBL-05=PASS_DESIGN_AT_1EB3140`, `VBL-06=PASS_DESIGN_AT_1EB3140`,
+`DEP-007=OPEN_FOR_EXECUTABLE_AND_PRODUCTION_EVIDENCE`, and `IMPLEMENTATION_AUTHORIZED=NO`.

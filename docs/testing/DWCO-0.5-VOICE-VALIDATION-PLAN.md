@@ -21,7 +21,7 @@ IMPLEMENTATION_AUTHORIZED=NO
 
 | ID | Required assertion |
 |---|---|
-| QA-01 | Contract, seven ADRs, threat model, supported development-build matrix, pinned dependencies, limits, rollback, and exact reviewers are approved before code |
+| QA-01 | Contract, seven ADRs, threat model, supported development-build matrix, pinned dependencies, installed native/transitive licence notices, repository licensing decision, limits, rollback, and exact reviewers are approved before code |
 | QA-02 | Migration upgrade/downgrade/re-upgrade and database constraints pass on disposable data without DWCO 0.1–0.4 regression |
 | QA-03 | Ring, accept, decline, caller cancel, either-party end, missed, negotiation failure, reconnect, and duration cap reach exactly one documented state |
 | QA-04 | Invalid actor/state/call-leg/version commands fail without partial mutation; terminal state is immutable |

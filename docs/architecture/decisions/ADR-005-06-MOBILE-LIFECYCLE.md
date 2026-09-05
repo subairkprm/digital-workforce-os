@@ -1,9 +1,9 @@
 # ADR-005-06: mobile lifecycle
 
-STATUS=PROPOSED_DEPENDENCIES_SELECTED_APPROVAL_AND_PROOF_OPEN
+STATUS=TECHNICAL_DESIGN_ACCEPTED_LICENSING_AND_PROOF_OPEN
 
-DWCO 0.5 supports foreground iOS and Android development builds using a pinned, licence-clean native
-WebRTC dependency and a checked-in, minimal project config plugin. The third-party Expo WebRTC plugin
+DWCO 0.5 supports foreground iOS and Android development builds using a version-pinned native WebRTC
+candidate and a checked-in, minimal project config plugin. The third-party Expo WebRTC plugin
 is rejected because it expands camera, overlay, wake-lock, Bluetooth, and iOS camera-description
 surfaces. The project plugin must remove the bridge's media-projection service and allowlist only the
 reviewed audio/network and API-scoped Bluetooth configuration. Expo Go, background wake, push,
@@ -20,6 +20,7 @@ resume obtains a fresh realtime ticket and authoritative HTTP catch-up; it never
 claims a phantom active call.
 
 The candidate bridge, project configuration path, and effective platform matrix are fixed in
-[`../DWCO-0.5-RUNTIME-SELECTION.md`](../DWCO-0.5-RUNTIME-SELECTION.md). Mobile and Voice/WebRTC must
-still approve the corrected proposal. Clean-prebuild manifest assertions, native builds, audio-route
-controls, permissions, and reproducible two-device relay-only calls remain mandatory evidence.
+[`../DWCO-0.5-RUNTIME-SELECTION.md`](../DWCO-0.5-RUNTIME-SELECTION.md) and technically accepted at
+`1eb3140`. VBL-04 remains open for repository and installed native/transitive licensing decisions.
+Clean-prebuild manifest assertions, native builds, audio-route controls, permissions, and
+reproducible two-device relay-only calls remain mandatory evidence.

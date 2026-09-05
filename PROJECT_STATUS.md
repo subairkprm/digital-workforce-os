@@ -19,7 +19,7 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 | DWCO 0.3 Workforce Operations | Complete | `docs/completion-reports/DWCO-0.3-WORKFORCE-OPERATIONS.md` |
 | DWCO 0.4 Presence prerequisite | Complete | Presence report; included in accepted stage evidence |
 | DWCO 0.4 Realtime Communication | Complete | PR #21 plus remediation commits `539d07a`, `97e3664`, and `607e6c0`; all required reviews recorded |
-| DWCO 0.5 App-to-app voice/WebRTC | Draft reviewed; pre-implementation decisions open | Contract package plus exact native/coturn candidates proposed; reviewer approval, executable proof, and implementation authorization remain open |
+| DWCO 0.5 App-to-app voice/WebRTC | Draft reviewed; pre-implementation decisions open | Native/coturn technical design reviewed; VBL-04 licensing, executable proof, and Implementation Director authorization remain open |
 | PSTN / SIP / PBX | Not started | Provider and regulatory boundary not approved |
 | Mobility / eSIM | Not started | Carrier boundary not approved |
 | AI | Not started | Data, consent, and evaluation boundary not approved |

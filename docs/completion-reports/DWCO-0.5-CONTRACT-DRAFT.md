@@ -6,7 +6,11 @@ CONTRACT_PACKAGE_COMMIT=6A7456B
 
 RUNTIME_SELECTION_INITIAL_REVIEW_COMMIT=A4AF1DB
 
-RUNTIME_SELECTION_INITIAL_DECISION=FAIL_CORRECTED_PROPOSAL_REVIEW_OPEN
+RUNTIME_SELECTION_INITIAL_DECISION=FAIL_AT_A4AF1DB_SUPERSEDED_BY_CORRECTED_REVIEW
+
+RUNTIME_SELECTION_CORRECTED_REVIEW_COMMIT=1EB3140
+
+RUNTIME_SELECTION_CORRECTED_DECISION=PASS_DESIGN_WITH_VBL_04_LICENSING_BLOCKER
 
 STAGE_CREDIT=UNCHANGED_AT_48_PERCENT_OVERALL
 
@@ -19,8 +23,9 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 The documentation-only DWCO 0.5 package defines a bounded local one-to-one, same-tenant,
 foreground, relay-only audio/WebRTC stage. It creates no application behavior, schema, container,
 credential, shared environment, customer traffic, or deployment. The package is ready for immutable
-commit review. Exact native WebRTC and coturn candidates are now proposed, but their required
-approvals, executable proof, and all final exact-commit decisions remain open.
+commit review. The corrected native and coturn technical designs have been reviewed, with VBL-05 and
+VBL-06 accepted for design. VBL-04 remains open for repository/native/transitive licensing, all
+executable proof remains open, and implementation/deployment are not authorized.
 
 ## Files changed
 
@@ -82,9 +87,9 @@ approvals, executable proof, and all final exact-commit decisions remain open.
   pulled, or run.
 - Local native readiness inventory: Xcode 26.6 and Docker 29.7.2 are present; Java/Android tooling
   and CocoaPods were not detected, so no native build or device claim is made.
-- Live governance after reconciliation: `/healthz` returned healthy; `/api/governance` reported 48%
-  accepted, 48% implemented, five open reviews, current gate DWCO 0.5 contract approval, and no
-  deployment.
+- Live governance after reconciliation: `/healthz` returned healthy; `/api/governance` retained 48%
+  accepted, 48% implemented, current gate DWCO 0.5 contract approval, and no deployment. The open
+  review count is derived live from this approval register.
 - Remote GitHub CI: unresolved under DEP-001; no remote-pass claim is made.
 
 ## Independent review summary
@@ -101,24 +106,32 @@ core VBL-03 and its VBL-07 contract decisions; QA accepted VBL-06 test-design re
 DevOps/SRE passed the coturn digest proposal with blockers for reachability/NAT, exact identity, and
 secret lifecycle. This package now corrects those findings and requires a new exact-commit review.
 
+At `1eb3140`, Architecture/Mobile and Identity/Security passed the corrected technical native design
+with one retained VBL-04 licensing blocker: the repository has no declared project licence and the
+installed bridge/native/transitive notices have not been reviewed. QA passed VBL-06 design and
+DevOps/SRE passed VBL-05 design. All executable evidence, DEP-001, DEP-007, DEP-012, VBL-04, VBL-08,
+implementation, deployment, and stage credit remain open or unauthorized.
+
 ## Remaining gaps
 
 - Preserve merged `main` baseline `9188adc` (PR #25 DWCO 0.4 status closure) when reviewing and
   merging the DWCO 0.5 contract branch.
-- Approve or reject the proposed native WebRTC bridge, minimal project CNG plugin, effective
-  iOS/Android matrix, and reproducible development-build plan; establish the missing local
-  Android/CocoaPods prerequisites.
-- Approve or reject the exact coturn image digest, then prove the proposed hardening, secrets,
-  quotas, ports, resources, authenticated readiness, multi-architecture behavior, and cleanup.
-- Obtain final-target Identity/Security, QA/Validation, DevOps/SRE, and Implementation Director
-  decisions; Architecture has accepted the bounded design at `6a7456b`.
+- Obtain an explicit licensing decision for repository-owned source; review the installed WebRTC
+  package, embedded native binaries, transitive licences, and notices; establish the missing local
+  Android/CocoaPods prerequisites. VBL-04 remains open.
+- After separate Implementation Director authorization, implement and prove the accepted coturn
+  design's hardening, secrets, quotas, ports, resources, authenticated readiness,
+  multi-architecture behavior, and cleanup.
+- Obtain final VBL-04 licensing/Security/Mobile approval and the Implementation Director's exact
+  contract decision; technical Architecture, QA-design, and DevOps-design reviews are recorded.
 - DEP-001, DEP-007, DEP-012, remote CI, branch protection, shared scale, staging, production,
   privacy/legal/provider approval, incident/abuse operations, and penetration testing remain open.
 
 ## Recommended next approval gate
 
-Commit and publish this documentation-only branch, then review the immutable contract commit. The
-Implementation Director may next authorize only a bounded dependency/runtime-selection gate that
-closes VBL-04 and VBL-05 without product behavior or deployment. Product implementation begins only
-after every pre-implementation design blocker passes. PSTN/SIP/PBX, recording, AI, billing, eSIM,
-shared/staging environments, production credentials/data, and deployment remain unauthorized.
+Commit and publish this documentation-only review record. The next gate is a licensing decision for
+repository-owned source plus an installed native/transitive licence-and-notice review to close
+VBL-04. The Implementation Director may consider a bounded implementation branch only after that
+gate passes and must record explicit authorization against the final contract commit. PSTN/SIP/PBX,
+recording, AI, billing, eSIM, shared/staging environments, production credentials/data, and
+deployment remain unauthorized.
