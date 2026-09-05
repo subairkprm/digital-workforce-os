@@ -2,6 +2,8 @@
 
 REVIEW_STATUS=BLOCKED_PRE_IMPLEMENTATION_DECISIONS_OPEN
 
+CONTRACT_REVIEW_TARGET=6A7456B
+
 STAGE_CREDIT=UNCHANGED_AT_48_PERCENT_OVERALL
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
@@ -13,10 +15,10 @@ IMPLEMENTATION_STATUS=NOT_AUTHORIZED_NOT_STARTED
 | Gate | Result | Evidence or remaining action |
 |---|---|---|
 | Bounded product scope | Open; draft reviewed | `docs/implementation-contracts/DWCO-0.5-APP-VOICE-WEBRTC-CONTRACT.md`; Implementation Director decision required |
-| Architecture decision | Open; proposed ADRs ready | `docs/architecture/DWCO-0.5-WEBRTC-ARCHITECTURE.md` and seven proposed ADRs require exact-commit acceptance |
-| Identity/Security and privacy | Open; threat model ready | `docs/security/DWCO-0.5-VOICE-THREAT-MODEL.md`; consent, revocation, abuse, and retention require acceptance |
-| QA/Validation plan | Open; criteria ready | `docs/testing/DWCO-0.5-VOICE-VALIDATION-PLAN.md`; dependency/device/runtime evidence cannot exist before implementation |
-| DevOps/SRE boundary | Open; blocked on selections | Pin coturn digest, ports, resource caps, authenticated readiness, isolation, and cleanup before approval |
+| Architecture decision | Pass at `6a7456b`; downstream blockers retained | Seven ADRs and call-leg recovery are coherent for the bounded local package; no implementation authorization |
+| Identity/Security and privacy | Open; package passed with blockers at `03da95d` | Re-review the `6a7456b` call-leg amendment and accept threat model, proof, consent, revocation, abuse, and retention |
+| QA/Validation plan | Open; package passed with blockers at `03da95d` | Re-review `6a7456b`, then accept fixtures, QA-01 through QA-16, V01 through V32, and manifest |
+| DevOps/SRE boundary | Open; package passed with blockers at `03da95d` | Select/approve coturn digest, runtime configuration, readiness, isolation, and cleanup against final target |
 | Implementation Director approval | Open | Approve the final contract and named owners/reviewers before development |
 
 ## Review findings
@@ -37,10 +39,10 @@ Residual risks are explicit:
 
 | Reviewer | Draft finding | Required next action |
 |---|---|---|
-| Architecture | Boundary recommended; decisions required | Accept or amend ADR-005-01 through ADR-005-07 against exact commit |
-| Identity/Security | Criteria and adversarial matrix supplied | Accept or amend threat model, consent, revocation, retention, and authorization matrix |
-| QA/Validation | Criteria and 32-scenario guidance supplied | Reconcile final contract to executable test IDs after dependency/runtime choices |
-| DevOps/SRE | Blocked for implementation approval | Close VBL-04/VBL-05 and approve measurable local runtime before coding |
+| Architecture | Pass with blockers at `6a7456b`; lost-response blocker closed | VBL-02 and Architecture portion of VBL-07 accepted; retain downstream gates |
+| Identity/Security | Pass with blockers at `03da95d`; final focused review open | Review `6a7456b`, selected native dependency/coturn, and formally record VBL-03/VBL-07 |
+| QA/Validation | Pass with blockers at `03da95d`; final focused review open | Review `6a7456b`, then accept selected fixtures/runtime and VBL-06 |
+| DevOps/SRE | Pass with blockers at `03da95d` | Close VBL-05 and re-affirm DEP-001/DEP-007/DEP-012 at final target |
 
 ## Approval boundary
 

@@ -4,6 +4,8 @@ STATUS=PROPOSED_FOR_REQUIRED_REVIEW
 
 IMPLEMENTATION_AUTHORIZED=NO
 
+ARCHITECTURE_REVIEW=PASS_WITH_DOWNSTREAM_BLOCKERS_AT_6A7456B
+
 These decisions lock the bounded design only after the named reviewers approve an exact commit.
 They do not authorize code, shared infrastructure, credentials, or deployment.
 
@@ -17,4 +19,6 @@ They do not authorize code, shared infrastructure, credentials, or deployment.
 | [ADR-005-06](ADR-005-06-MOBILE-LIFECYCLE.md) | Foreground native development-build lifecycle | Mobile, Voice/WebRTC, QA |
 | [ADR-005-07](ADR-005-07-SHARED-SCALE-DEFERRAL.md) | Local single-instance boundary and future shared requirements | Architecture, DevOps/SRE, Realtime |
 
-All seven remain proposed until `docs/reviews/DWCO-0.5-CONTRACT-APPROVAL.md` records their decisions.
+Architecture accepted all seven at `6a7456b`, including the client-generated call-leg recovery
+amendment. The required Security, QA, DevOps/SRE, dependency/runtime, and Implementation Director
+decisions remain open in `docs/reviews/DWCO-0.5-CONTRACT-APPROVAL.md`.

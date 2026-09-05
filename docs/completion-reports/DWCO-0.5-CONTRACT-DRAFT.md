@@ -1,6 +1,8 @@
 # DWCO 0.5 contract-draft completion report
 
-REPORT_STATUS=DOCUMENTATION_PACKAGE_COMPLETE_IMPLEMENTATION_BLOCKED
+REPORT_STATUS=DOCUMENTATION_PACKAGE_COMPLETE_PREIMPLEMENTATION_GATES_OPEN
+
+CONTRACT_PACKAGE_COMMIT=6A7456B
 
 STAGE_CREDIT=UNCHANGED_AT_48_PERCENT_OVERALL
 
@@ -68,10 +70,11 @@ remain open.
 
 ## Independent review summary
 
-Architecture, Identity/Security, QA/Validation, and DevOps/SRE each found the evolving package
-suitable for continued contract review but withheld implementation authorization. Their substantive
-contradictions were reconciled in the draft. Final decisions must target the immutable documentation
-commit; the approval register remains open until that review occurs.
+Architecture passed the reconciled package with downstream blockers at `6a7456b` and explicitly
+closed the call-leg lost-response issue. Identity/Security and QA/Validation passed the parent
+package with blockers at `03da95d`; their focused `6a7456b` approval remains open. DevOps/SRE passed
+the parent package with blockers and confirmed that DEP-001, DEP-007, and DEP-012 remain open.
+No reviewer authorized implementation, shared use, deployment, or stage credit.
 
 ## Remaining gaps
 
@@ -80,8 +83,8 @@ commit; the approval register remains open until that review occurs.
   reproducible development-build plan.
 - Select and approve the exact coturn repository/image digest and prove the proposed hardening,
   secrets, quotas, ports, resources, authenticated readiness, and cleanup design.
-- Obtain exact-commit Architecture, Identity/Security, QA/Validation, DevOps/SRE, and Implementation
-  Director decisions.
+- Obtain final-target Identity/Security, QA/Validation, DevOps/SRE, and Implementation Director
+  decisions; Architecture has accepted the bounded design at `6a7456b`.
 - DEP-001, DEP-007, DEP-012, remote CI, branch protection, shared scale, staging, production,
   privacy/legal/provider approval, incident/abuse operations, and penetration testing remain open.
 
