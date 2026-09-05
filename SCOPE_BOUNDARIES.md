@@ -13,9 +13,9 @@
   durable bounded history, explicit receipts, sender redaction, retention maintenance, a no-op
   provider-neutral notification boundary, and metadata-only administration under DWCO 0.4.
 
-The complete implementation and remediation are merged through `607e6c0`; required reviews are
-recorded and DWCO 0.4 contributes its accepted 14 percentage points. External CI and deployment
-exceptions remain open.
+The complete implementation and remediation are merged through `607e6c0`; PR #25 records the
+accepted status on `main` at `9188adc`. Required reviews are recorded and DWCO 0.4 contributes its
+accepted 14 percentage points. External CI and deployment exceptions remain open.
 
 ## Current approval boundary
 

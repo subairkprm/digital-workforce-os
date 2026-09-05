@@ -2,7 +2,7 @@
 
 STATUS_AS_OF=2026-09-05
 
-SOURCE_OF_TRUTH=merged main at 607e6c0
+SOURCE_OF_TRUTH=merged main at 9188adc
 
 ACCEPTED_WEIGHTED_COMPLETION=48_PERCENT_APPROXIMATE
 
@@ -28,7 +28,8 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 
 ## Verification status
 
-- The complete DWCO 0.4 implementation and acceptance remediation are on `main` through `607e6c0`.
+- The complete DWCO 0.4 implementation/remediation is on `main` through `607e6c0`, and PR #25
+  records its accepted 48% status on `main` at `9188adc`.
 - Local fast, complete, and isolated Docker-backed gates passed for the reviewed implementation:
   35 backend tests at 92% coverage, 8 admin tests and production build, 5 mobile tests, 3 governance
   tests, dependency audits, Alembic `0005` round-trip, PostgreSQL 17, Redis 7, and readiness checks.

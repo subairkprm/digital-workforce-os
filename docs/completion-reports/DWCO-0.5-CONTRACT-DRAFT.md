@@ -78,7 +78,8 @@ No reviewer authorized implementation, shared use, deployment, or stage credit.
 
 ## Remaining gaps
 
-- Merge the stacked DWCO 0.4 status-closure branch before the DWCO 0.5 contract branch.
+- Preserve merged `main` baseline `9188adc` (PR #25 DWCO 0.4 status closure) when reviewing and
+  merging the DWCO 0.5 contract branch.
 - Select, license-check, and approve the native WebRTC dependency, minimum iOS/Android matrix, and
   reproducible development-build plan.
 - Select and approve the exact coturn repository/image digest and prove the proposed hardening,

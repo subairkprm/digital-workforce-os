@@ -6,7 +6,7 @@ IMPLEMENTATION_STATUS=NOT_AUTHORIZED_NOT_STARTED
 
 STAGE_WEIGHT=12_PERCENT
 
-BASELINE=APPLICATION_MAIN_607E6C0_WITH_STACKED_STATUS_CLOSURE_16F9697_PENDING_MERGE
+BASELINE=MAIN_9188ADC_DWCO_0.4_ACCEPTED
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 
@@ -269,7 +269,7 @@ invariants may not change without contract amendment.
 
 | ID | Owner | Required closure evidence |
 |---|---|---|
-| VBL-01 | Implementation Director | Merge the stacked DWCO 0.4 status closure before this branch and approve this exact contract commit and bounded product semantics |
+| VBL-01 | Implementation Director | Approve the exact final contract commit and bounded product semantics; PR #25 baseline closure is already merged at `9188adc` |
 | VBL-02 | Architecture | Accept the seven proposed decisions in `docs/architecture/decisions/` and the single-instance/shared-scale deferral |
 | VBL-03 | Identity/Security | Accept `docs/security/DWCO-0.5-VOICE-THREAT-MODEL.md`, revocation limits, consent, metadata, and abuse boundaries |
 | VBL-04 | Mobile + Voice/WebRTC | Select and approve a version-pinned, license-clean native WebRTC dependency, minimum iOS/Android matrix, and reproducible development-build plan; executable proof is pre-merge evidence |
