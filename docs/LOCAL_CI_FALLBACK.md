@@ -55,8 +55,9 @@ does not capture environment variables, filesystem paths, usernames, network add
 or customer data.
 
 The local governance service mounts `.local-ci` read-only and displays a validated, normalized copy.
-Missing receipts show `NOT RUN`; malformed or out-of-boundary receipts show `INVALID` without
-making the wider governance snapshot unavailable.
+Its host port binds to `127.0.0.1` by default; shared access requires a separately approved
+authentication and network boundary. Missing receipts show `NOT RUN`; malformed, contradictory, or
+out-of-boundary receipts show `INVALID` without making the wider governance snapshot unavailable.
 
 ## Enable the local hooks
 
@@ -66,10 +67,13 @@ This checkout is configured with:
 git config core.hooksPath .githooks
 ```
 
-Git and GitHub Desktop commits invoke the fast gate. Pushes invoke the exact-commit complete gate and
-reject the push if it fails. A cached result is reused only when both the cache and a valid passing
-receipt match the current `HEAD`. Other clones must run the configuration command once. Bypassing
-hooks is prohibited by the DWCO engineering process while remote CI is unavailable.
+Git and GitHub Desktop commits invoke the fast gate. Pushes parse Git's proposed refs, require every
+non-deletion ref to resolve to the checked-out commit, invoke the exact-commit complete gate, and
+reject the push if the generated receipt does not validate. Pushes containing different source
+commits must be split. A cached result is reused only when both the cache and a valid passing receipt
+match the pushed commit and the current workflow/gate hashes. Stale verifier locks are recovered.
+Other clones must run the configuration command once. Bypassing hooks is prohibited by the DWCO
+engineering process while remote CI is unavailable.
 
 ## Trust and release limits
 

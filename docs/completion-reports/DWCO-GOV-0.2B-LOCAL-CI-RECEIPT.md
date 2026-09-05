@@ -15,13 +15,21 @@ SECURITY_BOUNDARY=Receipt data is local, ignored by Git, size-limited, schema-no
 and excludes secrets, environment dumps, arbitrary fields, customer data, production access, and
 mutating controls
 
-TEST_RESULTS=Fast gate PASS; clean-tree exact-commit receipt PASS for implementation commit
+INITIAL_TEST_RESULTS=Fast gate PASS; clean-tree exact-commit receipt PASS for initial implementation commit
 `93e2a3a0688ac8f532262ca2435314d676d87d79` in 45 seconds on Darwin arm64, Python 3.12.14,
 Node 26.8.1, pnpm 11.19.0, and Docker 29.7.2; 35 backend tests PASS at 92% coverage; 8 admin tests
 and production build PASS; 5 mobile tests and Expo dependency check PASS; 7 governance parser, HTTP,
 receipt-sanitization, digest, HTML structure, and tab/view tests PASS; Python and pnpm audits PASS;
 Alembic `0001` through `0005` upgrade/downgrade/re-upgrade PASS; isolated PostgreSQL 17, Redis 7,
 API/governance readiness, migration-version, cleanup, and live control-plane survival PASS
+
+REMEDIATION_TEST_RESULTS=13 governance and hook tests PASS, including pushed-SHA mismatch rejection,
+post-attestation receipt validation, stale-lock recovery, serializer failure containment, and rejection
+of semantically contradictory PASS receipts; fast local gate PASS
+
+FINAL_REVIEW_RULE=The ignored receipt cannot canonically name its own final documentation commit. Before
+approval, `.local-ci/latest.json` must be regenerated from a clean tree and its source/final commit,
+workflow hash, gate hash, zero exit code, and clean flag must match the final reviewed PR head.
 
 READINESS_DECISION=LOCAL_CI_CONTROL_READY_FOR_PRIVATE_INTERNAL_DEVELOPMENT; full product readiness is not
 claimed and requires the remaining stage, operations, remote-CI, security, legal, and release gates

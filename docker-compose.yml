@@ -2,7 +2,7 @@ services:
   governance-web:
     build: ./governance-web
     ports:
-      - "${DWCO_GOVERNANCE_PORT:-3100}:8080"
+      - "127.0.0.1:${DWCO_GOVERNANCE_PORT:-3100}:8080"
     depends_on:
       governance-data:
         condition: service_healthy

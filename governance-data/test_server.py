@@ -156,6 +156,23 @@ class SnapshotTests(unittest.TestCase):
         self.assertNotIn("secret", snapshot["localCi"])
         self.assertEqual(snapshot["metrics"]["acceptedCompletion"], 34)
 
+    def test_contradictory_passing_receipts_fail_closed(self) -> None:
+        receipt_path = self.root / "latest.json"
+        contradictions = (
+            {"sourceCommit": "d" * 40},
+            {"gateExitCode": 7},
+            {"worktreeClean": False},
+        )
+
+        for changes in contradictions:
+            with self.subTest(changes=changes):
+                receipt = dict(VALID_RECEIPT)
+                receipt.update(changes)
+                receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+                self.assertEqual(
+                    load_local_ci_receipt(receipt_path)["result"], "INVALID"
+                )
+
     def test_http_api_and_head_are_read_only_and_uncached(self) -> None:
         receipt_path = self.root / "latest.json"
         receipt_path.write_text(json.dumps(VALID_RECEIPT), encoding="utf-8")

@@ -184,6 +184,12 @@ def load_local_ci_receipt(path: Path | None) -> dict[str, Any]:
         for field in ("durationSeconds", "gateExitCode"):
             if not isinstance(receipt.get(field), int) or receipt[field] < 0:
                 raise ValueError(f"Invalid {field}")
+        if receipt["result"] == "PASS" and not (
+            receipt["sourceCommit"] == receipt["finalCommit"]
+            and receipt["gateExitCode"] == 0
+            and receipt["worktreeClean"] is True
+        ):
+            raise ValueError("Contradictory passing receipt")
         runner = receipt.get("runner")
         if not isinstance(runner, dict):
             raise ValueError("Invalid runner")

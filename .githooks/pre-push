@@ -7,10 +7,53 @@ pass_file=$(git rev-parse --git-path dwco-pre-push.last-pass)
 head_sha=$(git rev-parse HEAD)
 receipt_file="$repo_dir/.local-ci/latest.json"
 lock_acquired=0
+zero_sha=0000000000000000000000000000000000000000
+pushed_sha=
 
-receipt_matches_head() {
+while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  [ -n "$local_ref" ] || continue
+  if [ "$local_sha" = "$zero_sha" ]; then
+    continue
+  fi
+  if [ -n "$pushed_sha" ] && [ "$pushed_sha" != "$local_sha" ]; then
+    echo "DWCO local CI supports one exact source commit per push; split this multi-ref push."
+    exit 1
+  fi
+  pushed_sha=$local_sha
+done
+
+if [ -z "$pushed_sha" ]; then
+  echo "No non-deletion commit requires DWCO local CI attestation."
+  exit 0
+fi
+
+if [ "$pushed_sha" != "$head_sha" ]; then
+  echo "Refusing to push $pushed_sha because the validated checkout is $head_sha."
+  echo "Check out the commit being pushed and run make ci-local-attest."
+  exit 1
+fi
+
+if [ -n "${PYTHON_BIN:-}" ]; then
+  python_cmd=$PYTHON_BIN
+elif command -v python3 >/dev/null 2>&1; then
+  python_cmd=$(command -v python3)
+else
+  dwco_runtime_deps=${CODEX_RUNTIME_DEPS:-}
+  if [ -z "$dwco_runtime_deps" ] && [ -n "${HOME:-}" ]; then
+    dwco_runtime_deps="${XDG_CACHE_HOME:-$HOME/.cache}/codex-runtimes/codex-primary-runtime/dependencies"
+  fi
+  if [ -n "$dwco_runtime_deps" ] && [ -x "$dwco_runtime_deps/python/bin/python3" ]; then
+    python_cmd="$dwco_runtime_deps/python/bin/python3"
+  else
+    echo "Python 3 is required to validate the local CI receipt."
+    exit 1
+  fi
+fi
+
+receipt_matches_push() {
   [ -f "$receipt_file" ] || return 1
-  python3 - "$receipt_file" "$head_sha" <<'PY'
+  "$python_cmd" - "$receipt_file" "$pushed_sha" "$repo_dir/.github/workflows/ci.yml" "$repo_dir/scripts/ci-local.sh" <<'PY'
+import hashlib
 import json
 import pathlib
 import sys
@@ -24,9 +67,32 @@ valid = (
     and receipt.get("sourceCommit") == sys.argv[2]
     and receipt.get("finalCommit") == sys.argv[2]
     and receipt.get("worktreeClean") is True
+    and receipt.get("gateExitCode") == 0
+    and receipt.get("workflowSha256")
+    == hashlib.sha256(pathlib.Path(sys.argv[3]).read_bytes()).hexdigest()
+    and receipt.get("gateScriptSha256")
+    == hashlib.sha256(pathlib.Path(sys.argv[4]).read_bytes()).hexdigest()
 )
 raise SystemExit(0 if valid else 1)
 PY
+}
+
+recover_stale_lock() {
+  [ -d "$lock_dir" ] || return 1
+  lock_pid=$(cat "$lock_dir/pid" 2>/dev/null || true)
+  case "$lock_pid" in
+    '') return 1 ;;
+    *[!0-9]*) ;;
+    *)
+      if kill -0 "$lock_pid" 2>/dev/null; then
+        return 1
+      fi
+      ;;
+  esac
+  rm -f "$lock_dir/pid"
+  rmdir "$lock_dir" 2>/dev/null || return 1
+  echo "Recovered a stale DWCO pre-push verification lock."
+  return 0
 }
 
 cleanup() {
@@ -39,11 +105,19 @@ trap cleanup EXIT INT TERM
 
 if mkdir "$lock_dir" 2>/dev/null; then
   lock_acquired=1
+elif recover_stale_lock && mkdir "$lock_dir" 2>/dev/null; then
+  lock_acquired=1
+fi
+
+if [ "$lock_acquired" -eq 1 ]; then
   printf '%s\n' "$$" > "$lock_dir/pid"
 else
   echo "Another DWCO pre-push verification is already running; waiting for it to finish."
   attempt=0
   while [ -d "$lock_dir" ]; do
+    if recover_stale_lock; then
+      break
+    fi
     attempt=$((attempt + 1))
     if [ "$attempt" -ge 300 ]; then
       echo "Timed out waiting for the existing DWCO pre-push verification."
@@ -52,18 +126,25 @@ else
     sleep 2
   done
 
-  if [ -f "$pass_file" ] && [ "$(cat "$pass_file")" = "$head_sha" ] && receipt_matches_head; then
-    echo "Reusing the successful DWCO verification for $head_sha."
+  if [ -f "$pass_file" ] && [ "$(cat "$pass_file")" = "$pushed_sha" ] && receipt_matches_push; then
+    echo "Reusing the successful DWCO verification for $pushed_sha."
     exit 0
   fi
 
-  echo "The concurrent DWCO verification did not pass for $head_sha."
+  echo "The concurrent DWCO verification did not pass for $pushed_sha."
   exit 1
 fi
 
-if "$repo_dir/scripts/ci-local-attest.sh"; then
-  printf '%s\n' "$head_sha" > "$pass_file"
+if [ -f "$pass_file" ] && [ "$(cat "$pass_file")" = "$pushed_sha" ] && receipt_matches_push; then
+  echo "Reusing the successful DWCO verification for $pushed_sha."
   exit 0
 fi
 
+if "$repo_dir/scripts/ci-local-attest.sh" && receipt_matches_push; then
+  printf '%s\n' "$pushed_sha" > "$pass_file"
+  exit 0
+fi
+
+rm -f "$pass_file"
+echo "DWCO local CI did not produce a valid receipt for $pushed_sha."
 exit 1

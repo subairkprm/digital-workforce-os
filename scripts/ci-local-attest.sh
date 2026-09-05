@@ -1,5 +1,5 @@
 #!/bin/sh
-set -u
+set -eu
 
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 receipt_dir="$repo_dir/.local-ci"
@@ -11,6 +11,7 @@ if [ -n "${HOME:-}" ]; then
   [ -n "$dwco_user_bin" ] || dwco_user_bin="$HOME/.local/bin"
 fi
 receipt_written=0
+temp_receipt=
 started_at=$(date -u "+%Y-%m-%dT%H:%M:%SZ")
 started_epoch=$(date +%s)
 
@@ -114,12 +115,35 @@ payload = {
 path = pathlib.Path(sys.argv[1])
 path.write_text(json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
 PY
+  "$python_cmd" - "$temp_receipt" <<'PY'
+import json
+import pathlib
+import sys
+
+receipt = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+valid = (
+    receipt.get("result") in {"PASS", "FAIL"}
+    and receipt.get("sourceCommit")
+    and receipt.get("finalCommit")
+    and isinstance(receipt.get("gateExitCode"), int)
+    and isinstance(receipt.get("worktreeClean"), bool)
+)
+if receipt.get("result") == "PASS":
+    valid = (
+        valid
+        and receipt["sourceCommit"] == receipt["finalCommit"]
+        and receipt["gateExitCode"] == 0
+        and receipt["worktreeClean"] is True
+    )
+raise SystemExit(0 if valid else 1)
+PY
   chmod 0644 "$temp_receipt"
   mv "$temp_receipt" "$latest_receipt"
   cp "$latest_receipt" "$receipt_dir/$source_commit.json"
   chmod 0644 "$receipt_dir/$source_commit.json"
   receipt_sha=$($python_cmd -c 'import hashlib,pathlib,sys; print(hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest())' "$latest_receipt")
   receipt_written=1
+  temp_receipt=
   printf 'LOCAL_CI_RECEIPT=%s\n' "$latest_receipt"
   printf 'LOCAL_CI_RECEIPT_SHA256=%s\n' "$receipt_sha"
   printf 'LOCAL_CI_RECEIPT_RESULT=%s\n' "$receipt_result"
@@ -127,21 +151,32 @@ PY
 
 finalize() {
   exit_code=$?
-  if [ "$receipt_written" -eq 0 ]; then
-    write_receipt FAIL "$exit_code" "Local gate interrupted or aborted before a complete result."
+  trap - EXIT
+  if [ -n "${temp_receipt:-}" ] && [ -f "$temp_receipt" ]; then
+    rm -f "$temp_receipt"
   fi
+  if [ "$exit_code" -ne 0 ] && [ "$receipt_written" -eq 0 ]; then
+    rm -f "$latest_receipt"
+    echo "Local CI attestation failed before a valid receipt was committed." >&2
+  fi
+  exit "$exit_code"
 }
 trap finalize EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
 if [ -n "$(git -C "$repo_dir" status --porcelain --untracked-files=normal)" ]; then
+  rm -f "$latest_receipt"
   write_receipt FAIL 2 "Gate refused: the source tree was not clean."
   exit 2
 fi
 
-"$repo_dir/scripts/ci-local.sh"
-gate_exit_code=$?
+rm -f "$latest_receipt"
+if "$repo_dir/scripts/ci-local.sh"; then
+  gate_exit_code=0
+else
+  gate_exit_code=$?
+fi
 final_commit=$(git -C "$repo_dir" rev-parse HEAD)
 if [ "$gate_exit_code" -ne 0 ]; then
   write_receipt FAIL "$gate_exit_code" "The complete local CI gate failed."
