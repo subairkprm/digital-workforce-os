@@ -5,7 +5,29 @@ repo_dir=$(git rev-parse --show-toplevel)
 lock_dir=$(git rev-parse --git-path dwco-pre-push.lock)
 pass_file=$(git rev-parse --git-path dwco-pre-push.last-pass)
 head_sha=$(git rev-parse HEAD)
+receipt_file="$repo_dir/.local-ci/latest.json"
 lock_acquired=0
+
+receipt_matches_head() {
+  [ -f "$receipt_file" ] || return 1
+  python3 - "$receipt_file" "$head_sha" <<'PY'
+import json
+import pathlib
+import sys
+
+try:
+    receipt = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+except (OSError, ValueError):
+    raise SystemExit(1)
+valid = (
+    receipt.get("result") == "PASS"
+    and receipt.get("sourceCommit") == sys.argv[2]
+    and receipt.get("finalCommit") == sys.argv[2]
+    and receipt.get("worktreeClean") is True
+)
+raise SystemExit(0 if valid else 1)
+PY
+}
 
 cleanup() {
   if [ "$lock_acquired" -eq 1 ]; then
@@ -30,7 +52,7 @@ else
     sleep 2
   done
 
-  if [ -f "$pass_file" ] && [ "$(cat "$pass_file")" = "$head_sha" ]; then
+  if [ -f "$pass_file" ] && [ "$(cat "$pass_file")" = "$head_sha" ] && receipt_matches_head; then
     echo "Reusing the successful DWCO verification for $head_sha."
     exit 0
   fi
@@ -39,7 +61,7 @@ else
   exit 1
 fi
 
-if "$repo_dir/scripts/ci-local.sh"; then
+if "$repo_dir/scripts/ci-local-attest.sh"; then
   printf '%s\n' "$head_sha" > "$pass_file"
   exit 0
 fi

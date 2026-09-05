@@ -52,11 +52,16 @@ cd "$repo_dir/mobile"
 
 echo "[4/5] Governance evidence and browser syntax"
 cd "$repo_dir/governance-data"
-"$ci_venv/bin/python" -m unittest -v test_server.py
+"$ci_venv/bin/python" -m unittest discover -v
 "$node_cmd" --check "$repo_dir/governance-web/app.js"
 
 echo "[5/5] Repository safety and workflow validation"
 cd "$repo_dir"
+test -f AGENTS.md
+test -f ARCHITECTURE.md
+test -f SECURITY.md
+test -f IMPLEMENTATION_PLAN.md
+test -f docker-compose.yml
 "$ci_venv/bin/python" -c 'import pathlib,yaml; yaml.safe_load(pathlib.Path(".github/workflows/ci.yml").read_text())'
 git diff --check
 if git ls-files | grep -E '(^|/)\.env($|\.)' | grep -v '\.env\.example$'; then

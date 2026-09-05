@@ -21,11 +21,13 @@ services:
     build: ./governance-data
     environment:
       DWCO_GOVERNANCE_EVIDENCE_ROOT: /evidence
+      DWCO_LOCAL_CI_RECEIPT: /local-ci/latest.json
     volumes:
       - ./PROJECT_STATUS.md:/evidence/PROJECT_STATUS.md:ro
       - ./MASTER_PROJECT_PLAN.md:/evidence/MASTER_PROJECT_PLAN.md:ro
       - ./DEPENDENCY_REGISTER.md:/evidence/DEPENDENCY_REGISTER.md:ro
       - ./docs/reviews:/evidence/reviews:ro
+      - ./.local-ci:/local-ci:ro
     read_only: true
     tmpfs:
       - /tmp

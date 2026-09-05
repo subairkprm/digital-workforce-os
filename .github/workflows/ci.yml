@@ -97,7 +97,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: python -m unittest -v test_server.py
+      - run: python -m unittest discover -v
         working-directory: governance-data
       - run: node --check governance-web/app.js
       - run: docker compose config --quiet
