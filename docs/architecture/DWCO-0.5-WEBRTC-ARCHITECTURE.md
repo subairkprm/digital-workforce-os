@@ -99,7 +99,8 @@ the implementation contract.
   backup/restore, and rollback require operational approval.
 - Hosted CI attestation and protected required checks remain unavailable under DEP-001.
 - Background incoming calling requires an approved push/native mobile capability.
-- A digest-pinned coturn runtime, native WebRTC package pair, OS/toolchain matrix, and resource
+- A digest-pinned coturn runtime, native WebRTC bridge plus minimal project CNG configuration,
+  OS/toolchain matrix, and resource
   limits are proposed in
   [`DWCO-0.5-RUNTIME-SELECTION.md`](DWCO-0.5-RUNTIME-SELECTION.md), but required approval and
   executable proof remain pre-implementation blockers rather than implementation authorization.

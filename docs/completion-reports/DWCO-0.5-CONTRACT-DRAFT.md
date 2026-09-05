@@ -4,7 +4,9 @@ REPORT_STATUS=DOCUMENTATION_PACKAGE_COMPLETE_PREIMPLEMENTATION_GATES_OPEN
 
 CONTRACT_PACKAGE_COMMIT=6A7456B
 
-RUNTIME_SELECTION_COMMIT=PENDING_IMMUTABLE_REVIEW_TARGET
+RUNTIME_SELECTION_INITIAL_REVIEW_COMMIT=A4AF1DB
+
+RUNTIME_SELECTION_INITIAL_DECISION=FAIL_CORRECTED_PROPOSAL_REVIEW_OPEN
 
 STAGE_CREDIT=UNCHANGED_AT_48_PERCENT_OVERALL
 
@@ -58,6 +60,13 @@ approvals, executable proof, and all final exact-commit decisions remain open.
   coexistence evidence so the gate is not circular.
 - Defined signaling pagination/gap behavior, participant export, feature configuration authority,
   abuse limits, numeric impairment/capacity thresholds, observability limits, and artifact formats.
+- Rejected the initial third-party Expo WebRTC config plugin after exact-source review found
+  unavoidable camera, overlay, wake-lock, Bluetooth, and camera-description expansion. The corrected
+  design uses a minimal checked-in CNG plugin, removes media projection, and fails clean prebuilds on
+  any unapproved generated native surface.
+- Replaced loopback-only coturn publication with a dedicated offline private-device LAN and explicit
+  static Docker/NAT address mapping; fixed numeric identity, writable tmpfs, secret creation, and
+  interruption-safe project-scoped cleanup requirements.
 
 ## Verification
 
@@ -86,12 +95,19 @@ package with blockers at `03da95d`; their focused `6a7456b` approval remains ope
 the parent package with blockers and confirmed that DEP-001, DEP-007, and DEP-012 remain open.
 No reviewer authorized implementation, shared use, deployment, or stage credit.
 
+At `a4af1db`, Architecture/Mobile, Identity/Security, and QA rejected the native runtime pair because
+the selected external Expo plugin violated the audio-only permission boundary. Security accepted the
+core VBL-03 and its VBL-07 contract decisions; QA accepted VBL-06 test-design readiness only.
+DevOps/SRE passed the coturn digest proposal with blockers for reachability/NAT, exact identity, and
+secret lifecycle. This package now corrects those findings and requires a new exact-commit review.
+
 ## Remaining gaps
 
 - Preserve merged `main` baseline `9188adc` (PR #25 DWCO 0.4 status closure) when reviewing and
   merging the DWCO 0.5 contract branch.
-- Approve or reject the proposed native WebRTC package pair, effective iOS/Android matrix, and
-  reproducible development-build plan; establish the missing local Android/CocoaPods prerequisites.
+- Approve or reject the proposed native WebRTC bridge, minimal project CNG plugin, effective
+  iOS/Android matrix, and reproducible development-build plan; establish the missing local
+  Android/CocoaPods prerequisites.
 - Approve or reject the exact coturn image digest, then prove the proposed hardening, secrets,
   quotas, ports, resources, authenticated readiness, multi-architecture behavior, and cleanup.
 - Obtain final-target Identity/Security, QA/Validation, DevOps/SRE, and Implementation Director

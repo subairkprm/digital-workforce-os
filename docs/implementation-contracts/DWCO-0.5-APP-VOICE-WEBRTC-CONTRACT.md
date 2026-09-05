@@ -272,7 +272,7 @@ invariants may not change without contract amendment.
 | VBL-01 | Implementation Director | Approve the exact final contract commit and bounded product semantics; PR #25 baseline closure is already merged at `9188adc` |
 | VBL-02 | Architecture | Accept the seven proposed decisions in `docs/architecture/decisions/` and the single-instance/shared-scale deferral |
 | VBL-03 | Identity/Security | Accept `docs/security/DWCO-0.5-VOICE-THREAT-MODEL.md`, revocation limits, consent, metadata, and abuse boundaries |
-| VBL-04 | Mobile + Voice/WebRTC | Approve or reject the exact package and device/build proposal in `docs/architecture/DWCO-0.5-RUNTIME-SELECTION.md`; clean native and physical-device proof is pre-merge evidence |
+| VBL-04 | Mobile + Voice/WebRTC | Approve or reject the exact bridge, minimal project CNG configuration, and device/build proposal in `docs/architecture/DWCO-0.5-RUNTIME-SELECTION.md`; clean native and physical-device proof is pre-merge evidence |
 | VBL-05 | DevOps/SRE | Approve or reject the exact coturn digest, ports, secret, hardening, resources, readiness, and cleanup proposal in `docs/architecture/DWCO-0.5-RUNTIME-SELECTION.md`; executable proof is pre-merge evidence |
 | VBL-06 | QA/Validation | Accept the design, fixture ownership, artifact manifest, QA-01 through QA-16, and V01 through V32; results are pre-merge evidence |
 | VBL-07 | Architecture + Identity/Security | Accept call-leg proof, bounded credential reuse, state/timeout/reservation, content-free notification, feature configuration, and export decisions |

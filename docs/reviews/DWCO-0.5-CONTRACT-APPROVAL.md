@@ -4,6 +4,10 @@ REVIEW_STATUS=BLOCKED_PRE_IMPLEMENTATION_DECISIONS_OPEN
 
 CONTRACT_REVIEW_TARGET=6A7456B
 
+RUNTIME_SELECTION_REVIEWED_TARGET=A4AF1DB
+
+RUNTIME_SELECTION_REVIEW_DECISION=FAIL_CORRECTED_PROPOSAL_REVIEW_OPEN
+
 STAGE_CREDIT=UNCHANGED_AT_48_PERCENT_OVERALL
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
@@ -16,9 +20,9 @@ IMPLEMENTATION_STATUS=NOT_AUTHORIZED_NOT_STARTED
 |---|---|---|
 | Bounded product scope | Open; draft reviewed | `docs/implementation-contracts/DWCO-0.5-APP-VOICE-WEBRTC-CONTRACT.md`; Implementation Director decision required |
 | Architecture decision | Pass at `6a7456b`; downstream blockers retained | Seven ADRs and call-leg recovery are coherent for the bounded local package; no implementation authorization |
-| Identity/Security and privacy | Open; package passed with blockers at `03da95d` | Re-review the final target, including the proposed packages, coturn digest, licences, permissions, proof, consent, revocation, abuse, and retention |
-| QA/Validation plan | Open; package passed with blockers at `03da95d` | Re-review the final target, then accept fixtures, package/device matrix, QA-01 through QA-16, V01 through V32, and manifest |
-| DevOps/SRE boundary | Open; package passed with blockers at `03da95d` | Approve the exact selection in `docs/architecture/DWCO-0.5-RUNTIME-SELECTION.md`; executable proof remains pre-merge |
+| Identity/Security and privacy | Core contract pass at `a4af1db`; corrected runtime review open | VBL-03 and Security portion of VBL-07 may close; review minimal native configuration, manifest stop rules, coturn topology, and secret lifecycle |
+| QA/Validation plan | Design pass at `a4af1db`; corrected runtime review open | VBL-06 may close for design only; review clean-prebuild allowlist, corrected fixture, device/NAT matrix, and manifest |
+| DevOps/SRE boundary | Pass with blockers at `a4af1db` | Review corrected private-LAN/NAT, numeric user, tmpfs and secret-cleanup proposal; executable proof remains pre-merge |
 | Implementation Director approval | Open | Approve the final contract and named owners/reviewers before development |
 
 ## Review findings
@@ -31,19 +35,27 @@ Residual risks are explicit:
 - Production deployment, provider credentials, and production data remain unauthorized.
 - A digest-pinned coturn runtime and hardening/resource configuration are proposed but not approved
   or proven.
-- A licence-clean native WebRTC package pair and supported iOS/Android development-build matrix are
-  proposed but not approved or proven; the upstream plugin table does not yet name Expo SDK 57.
+- A licence-clean native WebRTC bridge, project-owned minimal CNG configuration, and supported
+  iOS/Android development-build matrix are proposed but not approved or proven.
 - Coturn REST/HMAC provides bounded rather than immediate revocation of an existing hostile relay
   allocation; the proposed local hard limit is five minutes and shared/production use remains blocked.
+- The initial `a4af1db` native pair was rejected because the external Expo plugin unconditionally
+  expanded camera, overlay, wake-lock, Bluetooth, and iOS camera-description surfaces. The corrected
+  proposal rejects that plugin, requires a minimal project-owned CNG plugin, removes the bridge's
+  media-projection service, and adds generated-manifest stop tests.
+- The initial coturn proposal could not support physical peers over loopback and omitted advertised
+  Docker/NAT, numeric-user, and exact secret-lifecycle decisions. The corrected proposal uses a
+  dedicated offline private LAN and explicit static bridge/address mapping, UID/GID, tmpfs, and
+  interruption-safe scoped cleanup; it remains unapproved and unproven.
 
 ## Independent draft review
 
 | Reviewer | Draft finding | Required next action |
 |---|---|---|
-| Architecture | Pass with blockers at `6a7456b`; lost-response blocker closed | VBL-02 and Architecture portion of VBL-07 accepted; retain downstream gates |
-| Identity/Security | Pass with blockers at `03da95d`; final focused review open | Review the final selection target and formally record VBL-03/VBL-07 plus supply-chain/permission decisions |
-| QA/Validation | Pass with blockers at `03da95d`; final focused review open | Review the final target, then accept selected fixtures/runtime/device matrix and VBL-06 |
-| DevOps/SRE | Pass with blockers at `03da95d` | Review the pinned coturn proposal, decide VBL-05, and re-affirm DEP-001/DEP-007/DEP-012 |
+| Architecture + Mobile/Voice | Architecture passed at `6a7456b`; native pair failed at `a4af1db` | Review corrected project-owned plugin, manifest stop rules, package/build/device proof; VBL-04 remains open |
+| Identity/Security | Core contract pass; runtime selection failed at `a4af1db` | VBL-03 and Security portion of VBL-07 may close; review corrected least-privilege native/runtime proposal |
+| QA/Validation | Test design pass; runtime selection failed at `a4af1db` | VBL-06 may close for design only; review clean-prebuild allowlist and corrected fixture; VBL-04 remains open |
+| DevOps/SRE | Pass with blockers at `a4af1db` | Review corrected reachability/NAT/user/secret decisions; VBL-05 and DEP-001/DEP-007/DEP-012 remain open |
 
 ## Approval boundary
 

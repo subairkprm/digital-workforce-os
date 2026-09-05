@@ -28,12 +28,12 @@ IMPLEMENTATION_AUTHORIZED=NO
 | QA-05 | Lost-response retries with the same client proof/command are idempotent; changed proof/payload conflicts; simultaneous A-to-B/B-to-A glare produces one call |
 | QA-06 | Signaling is ordered and bounded; malformed, oversize, duplicate, stale, wrong-role, and expired data is rejected; HTTP recovers missed events |
 | QA-07 | Real peers establish encrypted audio through TURN/UDP and TURN/TCP; expiry, bounded credential reuse, outage, exhaustion, loss, latency, jitter, switch, and restart are deterministic |
-| QA-08 | Supported mobile development builds prove permission, foreground/background, interruption, bound-call-leg, reconnect/relaunch, route, mute, and cleanup behavior |
+| QA-08 | Clean Expo prebuilds match the approved Android permission/feature/service/provider and iOS usage-description/entitlement allowlists, then supported development builds prove permission, foreground/background, interruption, bound-call-leg, reconnect/relaunch, route, mute, and cleanup behavior |
 | QA-09 | User/membership/tenant revocation blocks later commands and delivery within 15 seconds; cooperative teardown and five-minute relay hard limit are measured |
 | QA-10 | Cross-tenant/nonparticipant ID substitution across every endpoint/event reveals no foreign identifier or signaling content |
 | QA-11 | Retention/purge is tenant-scoped, audited, idempotent; DB/log/trace/metric/audit/crash/mobile inspection finds no prohibited data |
 | QA-12 | Rate, concurrency, payload, candidate, queue, TURN allocation, resource, and backpressure limits fail closed without affecting messaging/presence |
-| QA-13 | Exact-tree fast/full/Docker, audits, build, migration, regression, secret scan, image/dependency scan, and governance pre/post health pass |
+| QA-13 | Exact-tree fast/full/Docker, clean-prebuild manifest-diff, audits, native build, migration, regression, secret scan, image/dependency scan, and governance pre/post health pass |
 | QA-14 | Content-free metrics and stable opaque correlation identify setup latency, state/result, route category, failures, quality buckets, and resource saturation |
 | QA-15 | Default-off kill switch blocks new calls/signals/credentials; bounded calls drain/end; ephemeral data/resources clear; unrelated 0.1–0.4 stays healthy |
 | QA-16 | Completion evidence maps every test to result/artifact/SHA/reviewer and states remote CI, residual risk, no deployment, and deferred scope truthfully |
@@ -59,6 +59,10 @@ The executable ownership and reviewer map is in
   duration cap, and 30-day metadata expiry/purge.
 - Verify logs, traces, metrics, notifications, audits, and admin responses contain no media, transcript,
   SDP, candidates, raw credentials, IP address, or precise device/network identifiers.
+- Fail clean-prebuild output containing Android camera/video feature or permission,
+  `SYSTEM_ALERT_WINDOW`, `WAKE_LOCK`, media-projection service, unapproved foreground/background
+  service/provider, or iOS camera usage description/entitlement. Verify API-scoped Bluetooth entries
+  and the exact approved microphone/audio/network allowlist.
 
 ## Network impairment matrix
 

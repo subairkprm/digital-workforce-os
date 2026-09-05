@@ -22,6 +22,8 @@ DOCKER_ISOLATION_STATUS=
 MIGRATION_ROUNDTRIP_STATUS=
 DEPENDENCY_LICENSE_STATUS=
 DEPENDENCY_IMAGE_SCAN_STATUS=
+ANDROID_MANIFEST_ALLOWLIST_STATUS=
+IOS_INFO_ENTITLEMENT_ALLOWLIST_STATUS=
 SECRET_SCAN_STATUS=
 GOVERNANCE_HEALTH_BEFORE=
 GOVERNANCE_HEALTH_AFTER=
@@ -34,7 +36,7 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 | E-AUTH | QA-09 to QA-10; V10 to V14 | JUnit/JSON denial matrix | scenario ID, non-sensitive status/event count, timing, pass/fail |
 | E-SIGNAL | QA-06; V08, V09, V18, V19, V24, V25 | JUnit/JSON signaling report | counts, revisions, gap outcome, bounds; no bodies/candidates |
 | E-MEDIA | QA-07; V01, V02, V20 to V23, V26 | JSON peer/network report | platform, transport enum, setup/recovery timing, DTLS-SRTP assertion, quality bucket |
-| E-MOBILE | QA-08; V15 to V18, V27 | JUnit/device summary | platform/OS/build hash, lifecycle state, resource cleanup; no device label/token |
+| E-MOBILE | QA-08; V15 to V18, V27 | Prebuild diff/hash plus JUnit/device summary | platform/OS/build hash, generated permission/feature/service/provider/usage-description allowlist result, lifecycle state, resource cleanup; no device label/token |
 | E-PRIVACY | QA-11; V28, V29 | Redaction inspection checklist | inspected DB/log/trace/audit/crash/mobile surfaces and zero prohibited matches |
 | E-LOAD | QA-12, QA-14; V24, V25, V30, V31 | JSON capacity/telemetry report | attempts, success/rejection, p50/p95, enum route, aggregate resources |
 | E-ROLLBACK | QA-15; V32 | Shell/JUnit summary | kill switch, drain, purge, scoped Docker cleanup, 0.1-0.4 and health results |

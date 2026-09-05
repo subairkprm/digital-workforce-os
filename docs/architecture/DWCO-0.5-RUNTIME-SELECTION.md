@@ -1,6 +1,6 @@
 # DWCO 0.5 dependency and local runtime selection
 
-SELECTION_STATUS=PROPOSED_FOR_SECURITY_QA_DEVOPS_APPROVAL
+SELECTION_STATUS=CORRECTED_PROPOSAL_FOR_SECURITY_QA_DEVOPS_APPROVAL
 
 SELECTION_AS_OF=2026-09-05
 
@@ -32,13 +32,23 @@ Java/Android SDK and CocoaPods readiness must be established without changing th
 | Component | Exact proposal | Integrity and licence | Compatibility decision |
 |---|---|---|---|
 | WebRTC bridge | `react-native-webrtc@124.0.8` | npm integrity `sha512-uuQxvmk+mvnk5U0tr+1N42sKZqgm41fJrBA+fmCvML9J9P4roSh2So82t5RHAlu/vE9vxu5AKgivAiH61clCBg==`; MIT | Peer range accepts React Native `>=0.60.0`; native build and device proof still required |
-| Expo config plugin | `@config-plugins/react-native-webrtc@15.0.2` | npm integrity `sha512-sH4T7Z4P2RowV91k9CEwEr0unn+396NBexxCNZwRXuJXwguDU1qZWpE6fcwN0730B8uiS83F7+CLTyhpC7qRHQ==`; MIT | Peer range accepts Expo `>=56`; upstream compatibility table does not yet name SDK 57, so clean prebuild/build proof is mandatory |
+| WebRTC native configuration | Project-owned `mobile/plugins/withDwcoAudioWebRtc.js`; no additional runtime package | Repository-reviewed source under the project licence | Must allowlist only approved audio/network configuration and remove prohibited merged-library surfaces; clean prebuild/build proof is mandatory |
+| Rejected plugin | `@config-plugins/react-native-webrtc@15.0.2` | npm integrity `sha512-sH4T7Z4P2RowV91k9CEwEr0unn+396NBexxCNZwRXuJXwguDU1qZWpE6fcwN0730B8uiS83F7+CLTyhpC7qRHQ==`; MIT | Rejected: it unconditionally adds camera, overlay, wake-lock, Bluetooth, and iOS camera-description entries outside this contract |
 
 The application must use an Expo development build. Expo Go is excluded because the selected bridge
-contains custom native code. The config plugin must supply an explicit microphone permission message.
-Camera permission and video capture are prohibited in this audio-only stage even if upstream defaults
-or library capabilities include them. Any generated permission or manifest expansion outside this
-contract is a review failure.
+contains custom native code. The checked-in project plugin must supply only an explicit microphone
+usage description on iOS. On Android it must add only `INTERNET`, `ACCESS_NETWORK_STATE`,
+`CHANGE_NETWORK_STATE`, `MODIFY_AUDIO_SETTINGS`, and `RECORD_AUDIO`, plus API-scoped
+`BLUETOOTH`/`BLUETOOTH_ADMIN` through API 30 and runtime `BLUETOOTH_CONNECT` for approved Bluetooth
+audio routing. The only added hardware feature is the microphone; it must not add camera, overlay,
+wake-lock, media-projection, video, background-call, or unrelated foreground-service privileges.
+
+The project plugin must also place an Android manifest merge removal for
+`com.oney.WebRTCModule.MediaProjectionService`, which the selected bridge otherwise contributes for
+screen sharing. No application code may expose video, screen capture, or `getDisplayMedia`. A clean
+prebuild assertion must inventory generated Android permissions, features, services, providers, and
+iOS usage descriptions/entitlements; any item outside the reviewed allowlist fails before compilation.
+Generated native directories remain disposable CNG output and must not become hand-edited authority.
 
 ### Supported build and device matrix
 
@@ -66,17 +76,62 @@ minimum floor are sampled, but this bounded stage does not claim exhaustive hand
 | Licence | BSD 3-Clause terms in the upstream `LICENSE` file |
 | Platforms resolved | `linux/amd64` and `linux/arm64` are present in the pinned multi-architecture manifest |
 | Compose project | `dwco-voice-ci`, isolated from development, governance, and normal `dwco-ci` |
-| Listener | Host loopback `13478` UDP/TCP; no host networking and no public STUN |
+| Listener | Selected private test-LAN host interface on `13478` UDP/TCP; never loopback, wildcard, public, or host networking |
 | Relay range | UDP `49160-49259`, bounded to the isolated voice-test project |
 | Resource ceiling | 1 CPU, 256 MiB memory, 100 PIDs, 65,536 open files; Docker logs 10 MiB times three |
-| Hardening proposal | Drop all capabilities, no-new-privileges, read-only root, bounded tmpfs, documented non-root UID where supported |
-| Secret proposal | Fresh ignored `.env.dwco-voice-ci-turn-secret`, mounted read-only as a Docker secret and removed by scoped cleanup |
+| Container network | Static isolated bridge `172.31.250.0/29`; coturn relay address `172.31.250.2`; preflight fails on collision |
+| Advertised address | Explicit `${DWCO_TURN_HOST_LAN_IP}/172.31.250.2`; automatic public-IP detection is disabled |
+| Hardening proposal | Exact user `65534:65534`, drop all capabilities, no-new-privileges, read-only root, and bounded UID-owned tmpfs only |
+| Secret proposal | Fresh 32-byte random ignored `.env.dwco-voice-ci-turn-secret`, host mode `0600`, mounted read-only and removed by an interruption-safe scoped wrapper |
 | Readiness | Fresh authenticated allocation plus bidirectional relay probe from a separate test peer; a process/port check alone fails |
 
-The manifest digest was resolved without pulling or running the image. Resource, UID, read-only,
-secret, allocation, port, and cleanup settings remain unproven until the implementation evidence gate.
-TLS/TCP 5349, DNS, public ingress, certificates, staging, and production TURN remain excluded under
-DEP-007 and DEP-012.
+The pinned image declares `USER nobody:nogroup` and `/var/lib/coturn` as its writable volume. Compose
+must enforce numeric `65534:65534`; `/var/lib/coturn` and `/run/dwco` are the only writable tmpfs
+mounts, each `uid=65534,gid=65534,mode=0700`. Any different resolved identity or writable path fails
+the preflight. The command must override the image default so `detect-external-ip` never runs and no
+external DNS/public-address discovery occurs.
+
+### Physical-peer and Docker/NAT topology
+
+Physical evidence runs only on a dedicated, private, IPv4 test LAN containing the development host
+and the two named test devices, with no WAN uplink or public ingress. Before start, the operator must
+freeze `DWCO_TURN_HOST_LAN_IP` and the two peer `/32` addresses in the raw, non-committed evidence.
+Preflight fails unless they are RFC1918, are on the same dedicated interface/subnet, are not loopback
+or wildcard, and the interface has no public address. Published mappings bind only to the selected
+host address:
+
+```text
+${DWCO_TURN_HOST_LAN_IP}:13478 -> 172.31.250.2:3478/tcp+udp
+${DWCO_TURN_HOST_LAN_IP}:49160-49259 -> 172.31.250.2:49160-49259/udp
+```
+
+Coturn must use `relay-ip=172.31.250.2` and
+`external-ip=${DWCO_TURN_HOST_LAN_IP}/172.31.250.2`, preserving each relay port across Docker's NAT.
+It must also set `min-port=49160`, `max-port=49259`, `no-stun`, `no-cli`, `no-tls`, `no-dtls`,
+`fingerprint`, `lt-cred-mech`, `use-auth-secret`, `no-multicast-peers`, and the approved local realm.
+Raw allocation evidence must prove the XOR relayed address is the selected private host address and
+that both devices exchange packets bidirectionally; committed evidence contains only hashes and
+pass/fail, never IP addresses. Loopback-only smoke checks may supplement but cannot replace this test.
+
+### Secret creation and cleanup
+
+The DevOps-owned voice-test wrapper must set `umask 077`, create exactly 32 random bytes as 64
+lowercase hexadecimal characters in `.env.dwco-voice-ci-turn-secret`, verify current-user ownership
+and host mode `0600`, and never echo, export, interpolate into Compose, or pass the value as a process
+argument. The file is mounted read-only at `/run/secrets/dwco_turn_secret`.
+
+Running without shell tracing, the container wrapper reads that file and writes the final coturn
+configuration to UID-owned `/run/dwco/turnserver.conf` with mode `0600`; the coturn process receives
+only the configuration path. Host traps for normal exit, error, interrupt, and termination run
+project-scoped `docker compose --project-name dwco-voice-ci down --volumes --remove-orphans` and
+unlink only the named secret file. The postcondition requires the host secret, project containers,
+network, volumes, and generated in-container configuration to be absent. Failure of any cleanup
+assertion fails the gate and requires manual review; no broad Docker prune is allowed.
+
+The manifest digest was resolved without pulling or running the image. Resource, numeric-user,
+read-only, secret, allocation, NAT, port, and cleanup settings remain unproven until the executable
+evidence gate. TLS/TCP 5349, DNS, public ingress, certificates, staging, and production TURN remain
+excluded under DEP-007 and DEP-012.
 
 ## Verification and provenance
 
@@ -96,7 +151,8 @@ Primary references:
 - [React Native WebRTC repository and supported architectures](https://github.com/react-native-webrtc/react-native-webrtc)
 - [React Native WebRTC iOS installation](https://github.com/react-native-webrtc/react-native-webrtc/blob/master/Documentation/iOSInstallation.md)
 - [React Native WebRTC Android installation](https://github.com/react-native-webrtc/react-native-webrtc/blob/master/Documentation/AndroidInstallation.md)
-- [Expo WebRTC config plugin](https://github.com/expo/config-plugins/tree/main/packages/react-native-webrtc)
+- [Rejected Expo WebRTC config plugin source](https://github.com/expo/config-plugins/tree/main/packages/react-native-webrtc)
+- [React Native WebRTC Android manifest](https://github.com/react-native-webrtc/react-native-webrtc/blob/124.0.8/android/src/main/AndroidManifest.xml)
 - [coturn 4.17.2 release](https://github.com/coturn/coturn/releases/tag/4.17.2)
 - [Official coturn container tags](https://hub.docker.com/r/coturn/coturn/tags)
 - [coturn licence](https://github.com/coturn/coturn/blob/4.17.2/LICENSE)
@@ -105,7 +161,7 @@ Primary references:
 
 | Reviewer | Required decision before closure |
 |---|---|
-| Mobile + Voice/WebRTC | Accept the package pair, permissions, effective OS/toolchain matrix, development-build workflow, and physical-device evidence plan |
+| Mobile + Voice/WebRTC | Accept the bridge, project-owned minimal CNG plugin design, permissions, effective OS/toolchain matrix, development-build workflow, and physical-device evidence plan |
 | Identity/Security | Accept package licences, microphone-only permission boundary, digest pin, secret handling, credential TTL, relay-only policy, and residual upstream/supply-chain risk |
 | QA/Validation | Accept the emulator/physical/cross-platform/audio-route matrix and define artifact ownership for every required result |
 | DevOps/SRE | Accept the multi-architecture digest, collision-free ports, isolation, hardening, resources, readiness, failure injection, and scoped cleanup plan |
