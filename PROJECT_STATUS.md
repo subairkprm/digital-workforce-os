@@ -19,7 +19,7 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 | DWCO 0.3 Workforce Operations | Complete | `docs/completion-reports/DWCO-0.3-WORKFORCE-OPERATIONS.md` |
 | DWCO 0.4 Presence prerequisite | Complete | Presence report; included in accepted stage evidence |
 | DWCO 0.4 Realtime Communication | Complete | PR #21 plus remediation commits `539d07a`, `97e3664`, and `607e6c0`; all required reviews recorded |
-| DWCO 0.5 App-to-app voice/WebRTC | Draft reviewed; pre-implementation decisions open | Contract, seven ADRs, threat model, validation plan, and blocker register proposed; implementation not authorized |
+| DWCO 0.5 App-to-app voice/WebRTC | Draft reviewed; pre-implementation decisions open | Contract package plus exact native/coturn candidates proposed; reviewer approval, executable proof, and implementation authorization remain open |
 | PSTN / SIP / PBX | Not started | Provider and regulatory boundary not approved |
 | Mobility / eSIM | Not started | Carrier boundary not approved |
 | AI | Not started | Data, consent, and evaluation boundary not approved |
@@ -47,8 +47,8 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 - Restore GitHub Actions and enable required branch-protection checks.
 - Approve shared realtime broker and staging infrastructure before any shared-environment rollout.
 - Define dev/staging infrastructure before any production plan.
-- Close the DWCO 0.5 native dependency, coturn/runtime, exact-commit reviewer, and Implementation
-  Director approval blockers before app-to-app voice/WebRTC work.
+- Approve or reject the exact DWCO 0.5 native dependency and coturn/runtime proposal, then close all
+  exact-commit reviewer and Implementation Director blockers before app-to-app voice/WebRTC work.
 - Create later contracts for telecom, mobility, integrations, AI, billing, and production.
 
 ## Change rule

@@ -1,6 +1,6 @@
 # ADR-005-06: mobile lifecycle
 
-STATUS=PROPOSED_BLOCKED_ON_NATIVE_DEPENDENCY_PROOF
+STATUS=PROPOSED_DEPENDENCIES_SELECTED_APPROVAL_AND_PROOF_OPEN
 
 DWCO 0.5 supports foreground iOS and Android development builds using a pinned, license-clean native
 WebRTC dependency. Expo Go, background wake, push, CallKit, Android Telecom/ConnectionService,
@@ -15,5 +15,7 @@ background, or OS interruption closes tracks, peer connection, timers, and subsc
 resume obtains a fresh realtime ticket and authoritative HTTP catch-up; it never auto-answers or
 claims a phantom active call.
 
-The exact dependency/version, minimum OS matrix, native build commands, audio route controls, and
-reproducible two-device proof remain Mobile and Voice/WebRTC approval blockers.
+The candidate package pair and effective platform matrix are fixed in
+[`../DWCO-0.5-RUNTIME-SELECTION.md`](../DWCO-0.5-RUNTIME-SELECTION.md). Mobile and Voice/WebRTC must
+still approve them, and clean native builds, audio-route controls, permissions, and reproducible
+two-device relay-only calls remain mandatory executable proof.

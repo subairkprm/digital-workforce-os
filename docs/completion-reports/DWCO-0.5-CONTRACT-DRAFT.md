@@ -4,6 +4,8 @@ REPORT_STATUS=DOCUMENTATION_PACKAGE_COMPLETE_PREIMPLEMENTATION_GATES_OPEN
 
 CONTRACT_PACKAGE_COMMIT=6A7456B
 
+RUNTIME_SELECTION_COMMIT=PENDING_IMMUTABLE_REVIEW_TARGET
+
 STAGE_CREDIT=UNCHANGED_AT_48_PERCENT_OVERALL
 
 IMPLEMENTATION_STATUS=NOT_AUTHORIZED_NOT_STARTED
@@ -15,8 +17,8 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 The documentation-only DWCO 0.5 package defines a bounded local one-to-one, same-tenant,
 foreground, relay-only audio/WebRTC stage. It creates no application behavior, schema, container,
 credential, shared environment, customer traffic, or deployment. The package is ready for immutable
-commit review, but the native WebRTC and coturn runtime selections plus all exact-commit approvals
-remain open.
+commit review. Exact native WebRTC and coturn candidates are now proposed, but their required
+approvals, executable proof, and all final exact-commit decisions remain open.
 
 ## Files changed
 
@@ -27,6 +29,8 @@ remain open.
   `docs/reviews/DWCO-0.5-CONTRACT-APPROVAL.md`.
 - Architecture proposal and seven ADRs under `docs/architecture/` and
   `docs/architecture/decisions/`.
+- Exact dependency, platform matrix, coturn digest, and local-runtime proposal in
+  `docs/architecture/DWCO-0.5-RUNTIME-SELECTION.md`.
 - Security threat model: `docs/security/DWCO-0.5-VOICE-THREAT-MODEL.md`.
 - QA plan, 32-case adversarial/lifecycle matrix, and evidence-manifest template under
   `docs/testing/`.
@@ -58,14 +62,20 @@ remain open.
 ## Verification
 
 - `git diff --check`: pass.
-- Local Markdown path/link reconciliation across 52 files: pass.
+- Local Markdown path/link reconciliation across 53 files: pass.
 - `./scripts/ci-local-fast.sh`: pass.
 - Backend: lint/format/type checks and 35 tests passed.
 - Admin Web: type check and 8 tests passed.
 - Mobile: type check, 5 tests, and Expo dependency compatibility passed.
 - Governance: 3 parser/API tests and repository/workflow safety passed.
-- Live governance before/after: `/healthz` returned healthy; `/api/governance` reported 48% accepted,
-  48% implemented, six open reviews, current gate DWCO 0.5 contract approval, and no deployment.
+- Native/runtime metadata: exact npm versions, integrity values, peer ranges, licences, coturn source
+  tag/commit, and multi-architecture image digest resolved read-only; no package or image was installed,
+  pulled, or run.
+- Local native readiness inventory: Xcode 26.6 and Docker 29.7.2 are present; Java/Android tooling
+  and CocoaPods were not detected, so no native build or device claim is made.
+- Live governance after reconciliation: `/healthz` returned healthy; `/api/governance` reported 48%
+  accepted, 48% implemented, five open reviews, current gate DWCO 0.5 contract approval, and no
+  deployment.
 - Remote GitHub CI: unresolved under DEP-001; no remote-pass claim is made.
 
 ## Independent review summary
@@ -80,10 +90,10 @@ No reviewer authorized implementation, shared use, deployment, or stage credit.
 
 - Preserve merged `main` baseline `9188adc` (PR #25 DWCO 0.4 status closure) when reviewing and
   merging the DWCO 0.5 contract branch.
-- Select, license-check, and approve the native WebRTC dependency, minimum iOS/Android matrix, and
-  reproducible development-build plan.
-- Select and approve the exact coturn repository/image digest and prove the proposed hardening,
-  secrets, quotas, ports, resources, authenticated readiness, and cleanup design.
+- Approve or reject the proposed native WebRTC package pair, effective iOS/Android matrix, and
+  reproducible development-build plan; establish the missing local Android/CocoaPods prerequisites.
+- Approve or reject the exact coturn image digest, then prove the proposed hardening, secrets,
+  quotas, ports, resources, authenticated readiness, multi-architecture behavior, and cleanup.
 - Obtain final-target Identity/Security, QA/Validation, DevOps/SRE, and Implementation Director
   decisions; Architecture has accepted the bounded design at `6a7456b`.
 - DEP-001, DEP-007, DEP-012, remote CI, branch protection, shared scale, staging, production,
