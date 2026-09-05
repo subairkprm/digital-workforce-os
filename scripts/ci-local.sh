@@ -2,9 +2,15 @@
 set -eu
 
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+dwco_runtime_deps=${CODEX_RUNTIME_DEPS:-}
+dwco_user_bin=${XDG_BIN_HOME:-}
+if [ -n "${HOME:-}" ]; then
+  [ -n "$dwco_runtime_deps" ] || dwco_runtime_deps="${XDG_CACHE_HOME:-$HOME/.cache}/codex-runtimes/codex-primary-runtime/dependencies"
+  [ -n "$dwco_user_bin" ] || dwco_user_bin="$HOME/.local/bin"
+fi
 if [ -n "${NODE_BIN:-}" ]; then node_cmd=$NODE_BIN
 elif command -v node >/dev/null 2>&1; then node_cmd=$(command -v node)
-elif [ -x /Users/subair/.local/bin/node ]; then node_cmd=/Users/subair/.local/bin/node
+elif [ -n "$dwco_user_bin" ] && [ -x "$dwco_user_bin/node" ]; then node_cmd="$dwco_user_bin/node"
 else echo "Node.js is required"; exit 1
 fi
 PATH=$(dirname "$node_cmd"):$PATH
@@ -13,12 +19,12 @@ if [ -d /Applications/Docker.app/Contents/Resources/bin ]; then
 fi
 export PATH
 if [ -n "${PYTHON_BIN:-}" ]; then python_cmd=$PYTHON_BIN
-elif [ -x /Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 ]; then python_cmd=/Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3
+elif [ -n "$dwco_runtime_deps" ] && [ -x "$dwco_runtime_deps/python/bin/python3" ]; then python_cmd="$dwco_runtime_deps/python/bin/python3"
 else python_cmd=python3
 fi
 if [ -n "${PNPM_BIN:-}" ]; then pnpm_cmd=$PNPM_BIN
 elif command -v pnpm >/dev/null 2>&1; then pnpm_cmd=pnpm
-elif [ -x /Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm ]; then pnpm_cmd=/Users/subair/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm
+elif [ -n "$dwco_runtime_deps" ] && [ -x "$dwco_runtime_deps/bin/fallback/pnpm" ]; then pnpm_cmd="$dwco_runtime_deps/bin/fallback/pnpm"
 else echo "pnpm is required"; exit 1
 fi
 if [ -n "${DOCKER_BIN:-}" ]; then docker_cmd=$DOCKER_BIN
@@ -134,9 +140,14 @@ run_pnpm_audit
 
 echo "[6/7] Repository and workflow validation"
 cd "$repo_dir"
+test -f AGENTS.md
+test -f ARCHITECTURE.md
+test -f SECURITY.md
+test -f IMPLEMENTATION_PLAN.md
+test -f docker-compose.yml
 "$ci_venv/bin/python" -c 'import pathlib,yaml; yaml.safe_load(pathlib.Path(".github/workflows/ci.yml").read_text())'
 cd "$repo_dir/governance-data"
-"$ci_venv/bin/python" -m unittest -v test_server.py
+"$ci_venv/bin/python" -m unittest discover -v
 "$node_cmd" --check "$repo_dir/governance-web/app.js"
 cd "$repo_dir"
 git diff --check

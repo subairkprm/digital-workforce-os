@@ -7,3 +7,7 @@
 @media(max-width:900px){header{align-items:flex-start;gap:12px}.source-cluster{max-width:55%}.source{display:none}}
 @media(prefers-reduced-motion:no-preference){.tabs button,.rail nav a{transition:.16s ease}.metric{transition:transform .16s ease}.metric:hover{transform:translateY(-2px)}}
 .pending{background:#fffbeb;color:var(--amber)}
+.failed{background:#fff1f2;border-color:#fecdd3;color:var(--red)}
+.local-ci{overflow:visible}.receipt-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line)}.receipt-grid>div{background:#fff;padding:14px 20px;min-width:0}.receipt-grid small,.receipt-grid strong{display:block}.receipt-grid small{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}.receipt-grid strong{font-size:13px;margin-top:5px;overflow-wrap:anywhere}.connecting:before{background:#f59e0b}
+@media(max-width:760px){.receipt-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:470px){.receipt-grid{grid-template-columns:1fr}}
