@@ -2,7 +2,7 @@
 
 STATUS_AS_OF=2026-09-05
 
-SOURCE_OF_TRUTH=merged main at 9188adc
+SOURCE_OF_TRUTH=merged main at 9b165d8; content restored to baseline 9188adc
 
 ACCEPTED_WEIGHTED_COMPLETION=48_PERCENT_APPROXIMATE
 
