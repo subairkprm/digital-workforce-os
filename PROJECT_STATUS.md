@@ -10,7 +10,7 @@ CURRENT_GATE=DWCO_0.5_CONTRACT_APPROVAL
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 
-LOCAL_CI_FALLBACK_STATUS=EXACT_COMMIT_RECEIPT_IMPLEMENTED_PENDING_FINAL_GATE
+LOCAL_CI_FALLBACK_STATUS=EXACT_COMMIT_RECEIPT_ACTIVE_PASS_REQUIRED_PER_COMMIT
 
 DISTRIBUTION_STATUS=PRIVATE_INTERNAL_ONLY_PENDING_LEGAL_REVIEW
 
@@ -45,7 +45,8 @@ PRODUCTION_AUTHORIZED=NO
 - `main` is not protected; remediation was fast-forwarded directly and did not receive a GitHub PR
   review record. Independent agent review evidence is recorded in the repository.
 - `.githooks`, `scripts/ci-local-attest.sh`, and `docs/LOCAL_CI_FALLBACK.md` provide the local
-  exact-commit fallback; final evidence for this branch is pending the clean-tree complete gate.
+  exact-commit fallback. A clean-tree `PASS` receipt was produced for implementation commit
+  `93e2a3a`; every later commit requires its own matching receipt.
 - Local results are not a substitute for GitHub-attested required checks.
 - Product readiness is not yet confirmed: the repository is private/internal-development-only and
   legal, staging, production, later-stage, and release gates remain open.
