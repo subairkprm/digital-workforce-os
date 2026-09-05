@@ -2,19 +2,13 @@
 
 STATUS_AS_OF=2026-09-05
 
-SOURCE_OF_TRUTH=merged main at 9188adc
+SOURCE_OF_TRUTH=merged main at 607e6c0
 
 ACCEPTED_WEIGHTED_COMPLETION=48_PERCENT_APPROXIMATE
 
 CURRENT_GATE=DWCO_0.5_CONTRACT_APPROVAL
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
-
-LOCAL_CI_FALLBACK_STATUS=EXACT_COMMIT_RECEIPT_ACTIVE_PASS_REQUIRED_PER_COMMIT
-
-DISTRIBUTION_STATUS=PRIVATE_INTERNAL_ONLY_PENDING_LEGAL_REVIEW
-
-PRODUCTION_AUTHORIZED=NO
 
 ## Stage status
 
@@ -44,12 +38,8 @@ PRODUCTION_AUTHORIZED=NO
   recorded account billing/workflow-startup limitation.
 - `main` is not protected; remediation was fast-forwarded directly and did not receive a GitHub PR
   review record. Independent agent review evidence is recorded in the repository.
-- `.githooks`, `scripts/ci-local-attest.sh`, and `docs/LOCAL_CI_FALLBACK.md` provide the local
-  exact-commit fallback. A clean-tree `PASS` receipt was produced for implementation commit
-  `93e2a3a`; every later commit requires its own matching receipt.
+- `.githooks` and `docs/LOCAL_CI_FALLBACK.md` provide the current local fallback.
 - Local results are not a substitute for GitHub-attested required checks.
-- Product readiness is not yet confirmed: the repository is private/internal-development-only and
-  legal, staging, production, later-stage, and release gates remain open.
 
 ## Open governance gaps
 

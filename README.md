@@ -71,7 +71,6 @@ databases. Production deployment is not authorized by the Phase 1 contract.
 - Realtime/cache: Redis
 - Voice: WebRTC + coturn in later bounded contract
 - Deployment: Docker
-- CI: GitHub Actions authority; enforced exact-commit local fallback while hosted runs are blocked
+- CI: GitHub Actions
 
 See `ARCHITECTURE.md`, `PRODUCT.md`, `IMPLEMENTATION_PLAN.md`, `SECURITY.md`, and `AGENTS.md`.
-Local verification commands and trust limits are documented in `docs/LOCAL_CI_FALLBACK.md`.

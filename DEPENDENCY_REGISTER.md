@@ -3,7 +3,7 @@
 | ID | Dependency | State | Impact | Owner | Exit evidence |
 |---|---|---|---|---|---|
 | DEP-001 | GitHub Actions account/workflow startup | Blocked externally | No remote CI attestation | DevOps/SRE | Successful run and protected required checks |
-| DEP-002 | Local CI fallback | Active mitigation | Trusted-machine exact-commit evidence only; not remote attestation | DevOps/SRE + QA | Passing validated receipt for current commit; maintain until DEP-001 closes |
+| DEP-002 | Local CI fallback | Active mitigation | Trusted-machine evidence only | DevOps/SRE + QA | Maintain until DEP-001 closes |
 | DEP-003 | Realtime transport decision | Resolved for bounded DWCO 0.4 | WebSocket tickets plus HTTP catch-up accepted | Architecture + Realtime | Review and remediation evidence at `607e6c0` |
 | DEP-004 | Message persistence/delivery semantics | Resolved for bounded DWCO 0.4 | Direct durable ordered messaging accepted | Backend + Realtime | Review and remediation evidence at `607e6c0` |
 | DEP-005 | Retention, deletion, privacy, abuse policy | Resolved for bounded DWCO 0.4 | 90-day expiry, sender redaction, bounded access accepted | Identity/Security | Review and remediation evidence at `607e6c0` |

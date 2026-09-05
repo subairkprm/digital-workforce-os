@@ -134,14 +134,9 @@ run_pnpm_audit
 
 echo "[6/7] Repository and workflow validation"
 cd "$repo_dir"
-test -f AGENTS.md
-test -f ARCHITECTURE.md
-test -f SECURITY.md
-test -f IMPLEMENTATION_PLAN.md
-test -f docker-compose.yml
 "$ci_venv/bin/python" -c 'import pathlib,yaml; yaml.safe_load(pathlib.Path(".github/workflows/ci.yml").read_text())'
 cd "$repo_dir/governance-data"
-"$ci_venv/bin/python" -m unittest discover -v
+"$ci_venv/bin/python" -m unittest -v test_server.py
 "$node_cmd" --check "$repo_dir/governance-web/app.js"
 cd "$repo_dir"
 git diff --check

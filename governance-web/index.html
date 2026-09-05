@@ -13,84 +13,95 @@
     <aside class="rail">
       <div class="brand"><span class="brand-mark">DW</span><span><strong>DWCO Control</strong><small>Governance plane</small></span></div>
       <nav aria-label="Governance sections">
-        <a class="selected" href="#overview">Command overview</a>
-        <a href="#workspace">Stages &amp; requirements</a>
-        <a href="#workspace">Quality gates</a>
-        <a href="#workspace">Deviations</a>
-        <a href="#workspace">Next checkpoints</a>
+        <a class="selected" href="#overview">Command overview</a><a href="#workspace">Stages & requirements</a>
+        <a href="#workspace">Pull requests</a><a href="#workspace">Quality gates</a>
+        <a href="#workspace">Deviations</a><a href="#workspace">Risks & exceptions</a>
       </nav>
-      <div class="safe-mode"><strong>Read-only mode</strong><p>No merge, approval, deployment, production control, or GitHub credential is connected.</p></div>
+      <div class="safe-mode"><strong>Read-only mode</strong><p>No merge, approval, deployment or production controls are connected.</p></div>
     </aside>
 
     <main>
-      <header>
-        <div><small>DIGITAL WORKFORCE COMMUNICATION OS</small><h1>Project command overview</h1></div>
-        <div class="source-cluster"><span class="live-state connecting" id="live-status" aria-live="polite">Connecting to evidence…</span><button class="refresh" id="refresh-status" type="button">Refresh</button><span class="source" id="source-value">Source: repository evidence</span></div>
-      </header>
-
+      <header><div><small>DIGITAL WORKFORCE COMMUNICATION OS</small><h1>Project command overview</h1></div><span class="source">Source: main · d965126</span></header>
       <div class="content" id="overview">
-        <section class="hero">
-          <div><span class="gate" id="current-gate">Loading current gate</span><span class="date" id="updated-at">Loading evidence date…</span><h2 id="current-message">Loading the next controlled action from repository evidence.</h2></div>
-          <div class="locked"><span>✓</span><strong>Deployment locked</strong><small id="deployment-status">Not authorized</small></div>
-        </section>
+        <section class="hero"><div><span class="gate">GATE G3 · INDEPENDENT VERIFICATION</span><span class="date">Updated 04 Sep 2026</span><h2>DWCO 0.4 is built. Acceptance is the next controlled action.</h2></div><div class="locked"><span>✓</span><strong>Deployment locked</strong><small>Not authorized</small></div></section>
 
         <section class="metrics" aria-label="Project measures">
-          <article class="metric primary"><span>Accepted progress</span><strong id="accepted-progress">—</strong><small>Stage credit from canonical records</small></article>
-          <article class="metric"><span>Implemented weight</span><strong id="implemented-progress">—</strong><small>Includes pending acceptance</small></article>
-          <article class="metric"><span>Open reviews</span><strong id="open-review-count">—</strong><small>Required for the current gate</small></article>
-          <article class="metric"><span>Active exceptions</span><strong id="exception-count">—</strong><small>Parsed from review evidence</small></article>
-        </section>
+          <article class="metric primary"><span>Accepted progress</span><strong>34%</strong><small>Stages 0.1–0.3 accepted</small></article>
+          <article class="metric"><span>Implemented weight</span><strong>48%</strong><small>Includes pending DWCO 0.4</small></article>
+          <article class="metric"><span>Open reviews</span><strong>4</strong><small>All required for stage credit</small></article>
+          <article class="metric"><span>Active deviations</span><strong>4</strong><small>2 high · 2 medium</small></article>
+      <header><div><small>DIGITAL WORKFORCE COMMUNICATION OS</small><h1>Project command overview</h1></div><div class="source-cluster"><span class="live-state connecting" id="live-status" aria-live="polite">Connecting to evidence…</span><button class="refresh" id="refresh-status" type="button">Refresh</button><span class="source" id="source-value">Source: repository evidence</span></div></header>
+      <div class="content" id="overview">
+        <section class="hero"><div><span class="gate" id="current-gate">GATE G3 · INDEPENDENT VERIFICATION</span><span class="date" id="updated-at">Loading evidence date…</span><h2 id="current-message">Loading the next controlled action from repository evidence.</h2></div><div class="locked"><span>✓</span><strong>Deployment locked</strong><small id="deployment-status">Not authorized</small></div></section>
 
-        <section class="local-ci panel" aria-labelledby="local-ci-heading">
-          <div class="panel-head split"><div><h3 id="local-ci-heading">Local CI exact-commit receipt</h3><p>Trusted-machine evidence only; never a GitHub-hosted status check.</p></div><span class="status future" id="local-ci-result">NOT RUN</span></div>
-          <div class="receipt-grid">
-            <div><small>Commit</small><strong id="local-ci-commit">Unavailable</strong></div>
-            <div><small>Completed</small><strong id="local-ci-completed">Unavailable</strong></div>
-            <div><small>Duration</small><strong id="local-ci-duration">Unavailable</strong></div>
-            <div><small>Runner</small><strong id="local-ci-runner">Unavailable</strong></div>
-            <div><small>Evidence scope</small><strong id="local-ci-scope">Trusted local machine only</strong></div>
-            <div><small>Remote CI</small><strong id="local-ci-remote">Unavailable / not attested</strong></div>
-          </div>
+        <section class="metrics" aria-label="Project measures">
+          <article class="metric primary"><span>Accepted progress</span><strong id="accepted-progress">34%</strong><small>Stage credit from canonical records</small></article>
+          <article class="metric"><span>Implemented weight</span><strong id="implemented-progress">48%</strong><small>Includes pending acceptance</small></article>
+          <article class="metric"><span>Open reviews</span><strong id="open-review-count">4</strong><small>Required for current stage credit</small></article>
+          <article class="metric"><span>Active exceptions</span><strong id="exception-count">4</strong><small>Parsed from review evidence</small></article>
         </section>
 
         <section class="workspace" id="workspace">
           <div class="tabs" role="tablist" aria-label="Dashboard views">
             <button class="active" role="tab" aria-selected="true" data-view-button="stages">Stage map</button>
-            <button role="tab" aria-selected="false" data-view-button="quality">Current quality</button>
+            <button role="tab" aria-selected="false" data-view-button="quality">PR #21 quality</button>
             <button role="tab" aria-selected="false" data-view-button="deviations">Deviations</button>
             <button role="tab" aria-selected="false" data-view-button="journey">Next gates</button>
           </div>
 
           <div data-view="stages" class="view-grid">
-            <article class="panel table-panel">
-              <div class="panel-head"><h3>Delivery plan versus evidence</h3><p>Accepted status is intentionally stricter than code completion.</p></div>
-              <div class="table-wrap"><table><thead><tr><th>Stage</th><th>Capability</th><th>Weight</th><th>Status</th></tr></thead><tbody id="stage-rows"><tr><td>Loading</td><td>Repository evidence</td><td>—</td><td><span class="status future">Pending</span></td></tr></tbody></table></div>
-            </article>
-            <aside class="side-stack">
-              <article class="panel"><div class="panel-head"><h3>Readiness dimensions</h3></div><div class="bars"><label>Functional delivery <span id="implemented-readiness">—</span><i><b id="implemented-bar" style="width:0"></b></i></label><label>Governance acceptance <span id="accepted-readiness">—</span><i><b id="accepted-bar" style="width:0"></b></i></label></div></article>
-              <article class="control-rule"><strong>CONTROL RULE</strong><p>A red gate cannot be averaged away. Stage credit changes only after named reviewers approve exact-commit evidence.</p></article>
-            </aside>
+            <article class="panel table-panel"><div class="panel-head"><h3>Delivery plan versus evidence</h3><p>Accepted status is intentionally stricter than code completion.</p></div><div class="table-wrap"><table><thead><tr><th>Stage</th><th>Capability</th><th>Weight</th><th>Status</th></tr></thead><tbody>
+            <article class="panel table-panel"><div class="panel-head"><h3>Delivery plan versus evidence</h3><p>Accepted status is intentionally stricter than code completion.</p></div><div class="table-wrap"><table><thead><tr><th>Stage</th><th>Capability</th><th>Weight</th><th>Status</th></tr></thead><tbody id="stage-rows">
+              <tr><td>DWCO 0.1</td><td>Foundation</td><td>12%</td><td><span class="status accepted">Accepted</span></td></tr>
+              <tr><td>DWCO 0.2</td><td>Admin & security</td><td>10%</td><td><span class="status accepted">Accepted</span></td></tr>
+              <tr><td>DWCO 0.3</td><td>Workforce operations</td><td>12%</td><td><span class="status accepted">Accepted</span></td></tr>
+              <tr><td>DWCO 0.4</td><td>Realtime communication</td><td>14%</td><td><span class="status review">Review</span></td></tr>
+              <tr><td>DWCO 0.5</td><td>App voice / WebRTC</td><td>12%</td><td><span class="status future">Not started</span></td></tr>
+              <tr><td>DWCO 0.6</td><td>Telecom / PBX</td><td>12%</td><td><span class="status future">Not started</span></td></tr>
+              <tr><td>DWCO 0.7</td><td>Mobility / eSIM</td><td>8%</td><td><span class="status future">Not started</span></td></tr>
+              <tr><td>DWCO 0.8–1.0</td><td>Integrations, AI, pilot & production</td><td>20%</td><td><span class="status future">Not started</span></td></tr>
+            </tbody></table></div></article>
+            <aside class="side-stack"><article class="panel"><div class="panel-head"><h3>Readiness dimensions</h3></div><div class="bars">
+              <label>Functional delivery <span>48%</span><i><b style="width:48%"></b></i></label>
+              <label>Governance acceptance <span>34%</span><i><b style="width:34%"></b></i></label>
+              <label>Functional delivery <span id="implemented-readiness">48%</span><i><b id="implemented-bar" style="width:48%"></b></i></label>
+              <label>Governance acceptance <span id="accepted-readiness">34%</span><i><b id="accepted-bar" style="width:34%"></b></i></label>
+              <label>Security & privacy <span>42%</span><i><b style="width:42%"></b></i></label>
+              <label>Reliability & operations <span>18%</span><i><b style="width:18%"></b></i></label>
+              <label>Pilot readiness <span>12%</span><i><b style="width:12%"></b></i></label>
+            </div></article><article class="control-rule"><strong>CONTROL RULE</strong><p>A red gate cannot be averaged away. Stage credit changes only after named reviewers approve exact-commit evidence.</p></article></aside>
           </div>
 
           <div data-view="quality" hidden class="view-grid quality-grid">
-            <article class="panel"><div class="panel-head split"><div><h3 id="quality-title">Current acceptance evidence</h3><p>Live view of the version-controlled review record</p></div><span class="status review" id="quality-status">Pending</span></div><div class="check-list" id="quality-checks"><div><span><strong>Loading checks</strong><small>Waiting for repository evidence</small></span><em class="pending">PENDING</em></div></div></article>
-            <aside class="panel"><div class="panel-head"><h3>Required independent reviews</h3></div><div class="review-list" id="review-list"><div><strong>Loading reviews</strong><small>Waiting for repository evidence</small></div></div></aside>
+            <article class="panel"><div class="panel-head split"><div><h3>PR #21 · DWCO 0.4 realtime communication</h3><p>Merged to main · commit d965126</p></div><span class="status review">Acceptance pending</span></div><div class="check-list">
+            <article class="panel"><div class="panel-head split"><div><h3 id="quality-title">Current acceptance evidence</h3><p>Live view of the version-controlled review record</p></div><span class="status review" id="quality-status">Acceptance pending</span></div><div class="check-list" id="quality-checks">
+              <div><span><strong>Backend test suite</strong><small>31 passed</small></span><em class="pass">✓ PASS</em></div><div><span><strong>Backend coverage</strong><small>92%</small></span><em class="pass">✓ PASS</em></div>
+              <div><span><strong>Admin test suite</strong><small>8 passed</small></span><em class="pass">✓ PASS</em></div><div><span><strong>Mobile type & Expo checks</strong><small>Current</small></span><em class="pass">✓ PASS</em></div>
+              <div><span><strong>Migration 0005 round-trip</strong><small>Verified locally</small></span><em class="pass">✓ PASS</em></div><div><span><strong>GitHub Actions</strong><small>No usable attestation</small></span><em class="blocked">! BLOCKED</em></div><div><span><strong>Protected main</strong><small>Not enabled</small></span><em class="blocked">! BLOCKED</em></div>
+            </div></article>
+            <aside class="panel"><div class="panel-head"><h3>Required independent reviews</h3></div><div class="review-list"><div><strong>QA / Validation</strong><small>Fresh regression and traceability</small></div><div><strong>Architecture</strong><small>Hub, ordering and broker path</small></div><div><strong>Identity / Security</strong><small>Isolation, retention and abuse</small></div><div><strong>DevOps / SRE</strong><small>CI exception and rollback</small></div></div></aside>
           </div>
 
-          <div data-view="deviations" hidden class="panel"><div class="panel-head"><h3>Plan deviations and corrective controls</h3><p>Evidence-based variances; none are converted into accepted progress.</p></div><div class="deviation-grid" id="deviation-list"><article><span class="severity medium">Pending</span><small>Repository</small><h4>Loading exceptions</h4><p>Waiting for repository evidence.</p></article></div></div>
+          <div data-view="deviations" hidden class="panel"><div class="panel-head"><h3>Plan deviations and corrective controls</h3><p>Evidence-based variances; none are converted into accepted progress.</p></div><div class="deviation-grid">
+            <aside class="panel"><div class="panel-head"><h3>Required independent reviews</h3></div><div class="review-list" id="review-list"><div><strong>QA / Validation</strong><small>Fresh regression and traceability</small></div><div><strong>Architecture</strong><small>Hub, ordering and broker path</small></div><div><strong>Identity / Security</strong><small>Isolation, retention and abuse</small></div><div><strong>DevOps / SRE</strong><small>CI exception and rollback</small></div></div></aside>
+          </div>
+
+          <div data-view="deviations" hidden class="panel"><div class="panel-head"><h3>Plan deviations and corrective controls</h3><p>Evidence-based variances; none are converted into accepted progress.</p></div><div class="deviation-grid" id="deviation-list">
+            <article><span class="severity high">High</span><small>Implementation Director</small><h4>Implementation ahead of accepted plan</h4><p>DWCO 0.4 is merged, but four independent reviews are not recorded.</p></article>
+            <article><span class="severity high">High</span><small>DevOps / SRE</small><h4>Remote CI authority unavailable</h4><p>Local gates pass; GitHub Actions has no independent run evidence.</p></article>
+            <article><span class="severity medium">Medium</span><small>Architecture</small><h4>Realtime hub is process-local</h4><p>Shared deployment needs a broker design and staging proof.</p></article>
+            <article><span class="severity medium">Medium</span><small>Mobile + Integration</small><h4>Push delivery is a null adapter</h4><p>Background device delivery remains outside the current contract.</p></article>
+          </div></div>
 
           <div data-view="journey" hidden class="panel"><div class="panel-head"><h3>Controlled journey to product readiness</h3><p>Each checkpoint authorizes only the next bounded action.</p></div><div class="journey">
-            <article><b>G4</b><h4>Operational foundation</h4><p>Remote CI, protected main, staging, broker and restore.</p></article>
-            <article><b>G5</b><h4>WebRTC contract</h4><p>Secure app calling; no PSTN or recording.</p></article>
-            <article><b>G6</b><h4>Pilot product slice</h4><p>Push, recovery, support, data lifecycle and device E2E.</p></article>
-            <article><b>G7</b><h4>Kerala design pilot</h4><p>Two to five tenants, feature flags, on-call and exit criteria.</p></article>
-            <article><b>G8</b><h4>Regulated providers</h4><p>PSTN and eSIM only after legal and provider approval.</p></article>
-            <article><b>G9</b><h4>Production readiness</h4><p>Pen test, DR, SLOs, canary, support and privacy.</p></article>
-            <article><b>GA</b><h4>Product ready</h4><p>Scale evidence, closed critical risks and release approval.</p></article>
+            <article><b>G3</b><h4>Accept DWCO 0.4</h4><p>Independent reviews and exact-commit evidence</p></article><article><b>G4</b><h4>Operational foundation</h4><p>Remote CI, protected main, staging, broker and restore</p></article>
+            <article><b>G5</b><h4>WebRTC contract</h4><p>Secure app calling; no PSTN or recording</p></article><article><b>G6</b><h4>Pilot product slice</h4><p>Push, recovery, support, data lifecycle and device E2E</p></article>
+            <article><b>G7</b><h4>Kerala design pilot</h4><p>2–5 tenants, feature flags, on-call and exit criteria</p></article><article><b>G8</b><h4>Regulated providers</h4><p>PSTN/eSIM after legal and provider approval</p></article>
+            <article><b>G9</b><h4>Production readiness</h4><p>Pen test, DR, SLOs, canary, support and privacy</p></article><article><b>GA</b><h4>Product ready</h4><p>Scale evidence, closed critical risks and release approval</p></article>
           </div></div>
         </section>
-
-        <footer><span>Governance control plane · live read-only repository evidence</span><span>External actions, secrets, legal approval, and production access disabled</span></footer>
+        <footer><span>Governance prototype · read-only evidence model</span><span>External actions, secrets and production access disabled</span></footer>
+        <footer><span>Governance GOV 0.2A · live read-only repository evidence</span><span>External actions, secrets and production access disabled</span></footer>
       </div>
     </main>
   </div>

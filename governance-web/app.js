@@ -91,27 +91,6 @@ const setProgress = (prefix, value) => {
   if (bar) bar.style.width = `${progress}%`;
 };
 
-const humanize = (value) => String(value || 'Unavailable').replaceAll('_', ' ').toLowerCase();
-
-const renderLocalCi = (receipt = {}) => {
-  const result = receipt.result || 'NOT_RUN';
-  const badge = document.querySelector('#local-ci-result');
-  setText('#local-ci-result', result.replace('_', ' '));
-  if (badge) {
-    badge.className = `status ${result === 'PASS' ? 'accepted' : result === 'NOT_RUN' ? 'future' : 'failed'}`;
-  }
-  setText('#local-ci-commit', receipt.sourceCommit ? receipt.sourceCommit.slice(0, 12) : 'Unavailable');
-  setText('#local-ci-completed', receipt.completedAt || 'Unavailable');
-  setText('#local-ci-duration', Number.isInteger(receipt.durationSeconds) ? `${receipt.durationSeconds}s` : 'Unavailable');
-  const runner = receipt.runner || {};
-  const runnerText = [runner.os, runner.arch, runner.python && `Python ${runner.python}`, runner.node && `Node ${runner.node}`]
-    .filter(Boolean)
-    .join(' · ');
-  setText('#local-ci-runner', runnerText || 'Unavailable');
-  setText('#local-ci-scope', humanize(receipt.scope));
-  setText('#local-ci-remote', humanize(receipt.remoteCiStatus));
-};
-
 const renderSnapshot = (snapshot) => {
   const { meta, metrics } = snapshot;
   setText('#source-value', `Source: ${meta.sourceOfTruth}`);
@@ -129,7 +108,6 @@ const renderSnapshot = (snapshot) => {
   renderQuality(snapshot.qualityGates);
   renderReviews(snapshot.openReviews);
   renderExceptions(snapshot.exceptions);
-  renderLocalCi(snapshot.localCi);
   lastDigest = meta.contentDigest;
   liveStatus.className = 'live-state connected';
   liveStatus.textContent = `Live · ${meta.contentDigest} · refresh ${meta.refreshSeconds}s`;
