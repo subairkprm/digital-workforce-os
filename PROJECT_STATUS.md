@@ -1,14 +1,20 @@
 # Project status
 
-STATUS_AS_OF=2026-09-05
+STATUS_AS_OF=2026-09-06
 
-SOURCE_OF_TRUTH=merged main at 9188adc
+SOURCE_OF_TRUTH=merged main at ced18d0; content restored to baseline 9188adc
 
 ACCEPTED_WEIGHTED_COMPLETION=48_PERCENT_APPROXIMATE
 
 CURRENT_GATE=DWCO_0.5_CONTRACT_APPROVAL
 
 DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
+
+LOCAL_CI_FALLBACK_STATUS=EXACT_COMMIT_RECEIPT_ACTIVE_PASS_REQUIRED_PER_COMMIT
+
+DISTRIBUTION_STATUS=PRIVATE_INTERNAL_ONLY_PENDING_LEGAL_REVIEW
+
+PRODUCTION_AUTHORIZED=NO
 
 ## Stage status
 
@@ -31,16 +37,20 @@ DEPLOYMENT_STATUS=NOT_AUTHORIZED_NOT_DEPLOYED
 - The complete DWCO 0.4 implementation/remediation is on `main` through `607e6c0`, and PR #25
   records its accepted 48% status on `main` at `9188adc`.
 - Local fast, complete, and isolated Docker-backed gates passed for the reviewed implementation:
-  35 backend tests at 92% coverage, 8 admin tests and production build, 5 mobile tests, 3 governance
-  tests, dependency audits, Alembic `0005` round-trip, PostgreSQL 17, Redis 7, and readiness checks.
+  35 backend tests at 92% coverage, 8 admin tests and production build, 5 mobile tests, 13 governance
+  and hook tests, dependency audits, Alembic `0005` round-trip, PostgreSQL 17, Redis 7, and readiness checks.
 - Architecture, Identity/Security, and QA/Validation passed; DevOps/SRE passed with documented
   external exceptions. The live governance control plane remained API-healthy before and after CI.
 - Remote GitHub CI remains unresolved: Actions provides no usable run attestation because of the
   recorded account billing/workflow-startup limitation.
 - `main` is not protected; remediation was fast-forwarded directly and did not receive a GitHub PR
   review record. Independent agent review evidence is recorded in the repository.
-- `.githooks` and `docs/LOCAL_CI_FALLBACK.md` provide the current local fallback.
+- `.githooks`, `scripts/ci-local-attest.sh`, and `docs/LOCAL_CI_FALLBACK.md` provide the local
+  exact-commit fallback. The untracked clean-tree `PASS` receipt must match the current reviewed
+  commit; every later commit requires a newly generated matching receipt.
 - Local results are not a substitute for GitHub-attested required checks.
+- Product readiness is not yet confirmed: the repository is private/internal-development-only and
+  legal, staging, production, later-stage, and release gates remain open.
 
 ## Open governance gaps
 

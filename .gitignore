@@ -37,3 +37,5 @@ coverage/
 *.egg-info/
 *.tsbuildinfo
 backend/.ci-venv/
+.local-ci/*.json
+!.local-ci/.gitkeep
