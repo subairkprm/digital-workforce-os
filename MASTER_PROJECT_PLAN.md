@@ -29,7 +29,7 @@ integrations, and communication intelligence.
 | DWCO 0.2 | Admin and security closure | 10% | Complete |
 | DWCO 0.3 | Workforce operations | 12% | Complete |
 | DWCO 0.4 | Realtime presence and messaging | 14% | Complete |
-| DWCO 0.5 | App-to-app voice/WebRTC | 12% | Not started; contract approval next |
+| DWCO 0.5 | App-to-app voice/WebRTC | 12% | Draft reviewed; pre-implementation approvals open |
 | DWCO 0.6 | Telecom/PSTN/PBX provider integration | 12% | Not started |
 | DWCO 0.7 | Mobility/eSIM provider integration | 8% | Not started |
 | DWCO 0.8 | Business integrations | 7% | Not started |

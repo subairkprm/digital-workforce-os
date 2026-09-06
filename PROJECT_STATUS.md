@@ -1,8 +1,8 @@
 # Project status
 
-STATUS_AS_OF=2026-09-05
+STATUS_AS_OF=2026-09-06
 
-SOURCE_OF_TRUTH=merged main at 9b165d8; content restored to baseline 9188adc
+SOURCE_OF_TRUTH=merged main at ced18d0; content restored to baseline 9188adc
 
 ACCEPTED_WEIGHTED_COMPLETION=48_PERCENT_APPROXIMATE
 
@@ -25,7 +25,7 @@ PRODUCTION_AUTHORIZED=NO
 | DWCO 0.3 Workforce Operations | Complete | `docs/completion-reports/DWCO-0.3-WORKFORCE-OPERATIONS.md` |
 | DWCO 0.4 Presence prerequisite | Complete | Presence report; included in accepted stage evidence |
 | DWCO 0.4 Realtime Communication | Complete | PR #21 plus remediation commits `539d07a`, `97e3664`, and `607e6c0`; all required reviews recorded |
-| DWCO 0.5 App-to-app voice/WebRTC | Not started; contract gate next | No implementation is authorized until the contract gate closes |
+| DWCO 0.5 App-to-app voice/WebRTC | Draft reviewed; pre-implementation decisions open | Native/coturn technical design reviewed; VBL-04 licensing, executable proof, and Implementation Director authorization remain open |
 | PSTN / SIP / PBX | Not started | Provider and regulatory boundary not approved |
 | Mobility / eSIM | Not started | Carrier boundary not approved |
 | AI | Not started | Data, consent, and evaluation boundary not approved |
@@ -34,10 +34,11 @@ PRODUCTION_AUTHORIZED=NO
 
 ## Verification status
 
-- The complete DWCO 0.4 implementation and acceptance remediation are on `main` through `607e6c0`.
+- The complete DWCO 0.4 implementation/remediation is on `main` through `607e6c0`, and PR #25
+  records its accepted 48% status on `main` at `9188adc`.
 - Local fast, complete, and isolated Docker-backed gates passed for the reviewed implementation:
-  35 backend tests at 92% coverage, 8 admin tests and production build, 5 mobile tests, 3 governance
-  tests, dependency audits, Alembic `0005` round-trip, PostgreSQL 17, Redis 7, and readiness checks.
+  35 backend tests at 92% coverage, 8 admin tests and production build, 5 mobile tests, 13 governance
+  and hook tests, dependency audits, Alembic `0005` round-trip, PostgreSQL 17, Redis 7, and readiness checks.
 - Architecture, Identity/Security, and QA/Validation passed; DevOps/SRE passed with documented
   external exceptions. The live governance control plane remained API-healthy before and after CI.
 - Remote GitHub CI remains unresolved: Actions provides no usable run attestation because of the
@@ -56,7 +57,8 @@ PRODUCTION_AUTHORIZED=NO
 - Restore GitHub Actions and enable required branch-protection checks.
 - Approve shared realtime broker and staging infrastructure before any shared-environment rollout.
 - Define dev/staging infrastructure before any production plan.
-- Draft and approve a separate DWCO 0.5 contract before app-to-app voice/WebRTC work.
+- Approve or reject the exact DWCO 0.5 native dependency and coturn/runtime proposal, then close all
+  exact-commit reviewer and Implementation Director blockers before app-to-app voice/WebRTC work.
 - Create later contracts for telecom, mobility, integrations, AI, billing, and production.
 
 ## Change rule

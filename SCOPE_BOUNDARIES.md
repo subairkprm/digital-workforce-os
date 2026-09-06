@@ -5,7 +5,7 @@
 - Local platform foundation, tenancy, identity, RBAC, audit, and security controls.
 - Admin/security workflows and workforce operations through DWCO 0.3.
 
-## Implemented and merged, pending stage acceptance
+## Delivered and accepted through DWCO 0.4
 
 - Tenant-scoped presence status, polling, heartbeat expiry, directory visibility, admin read access,
   and mobile controls under `DWCO-0.4-PRESENCE`.
@@ -13,16 +13,21 @@
   durable bounded history, explicit receipts, sender redaction, retention maintenance, a no-op
   provider-neutral notification boundary, and metadata-only administration under DWCO 0.4.
 
-The complete implementation is merged through PR #21, but DWCO 0.4 does not receive stage credit
-until the required independent acceptance reviews are recorded.
+The complete implementation and remediation are merged through `607e6c0`; PR #25 records the
+accepted status on `main` at `9188adc`. Required reviews are recorded and DWCO 0.4 contributes its
+accepted 14 percentage points. External CI and deployment exceptions remain open.
 
-## Current acceptance boundary
+## Current approval boundary
 
-DWCO 0.4 realtime communication is under acceptance review. Review is limited to the merged contract,
-implementation, migration, tests, local verification, residual risks, and rollback evidence.
+DWCO 0.5 app-to-app voice/WebRTC is in contract review only. The proposed boundary is local,
+foreground, one-to-one, same-tenant, audio-only WebRTC with authenticated HTTP/PostgreSQL call-state
+authority, server-only WebSocket notifications, transient signaling, relay-only local coturn, and no
+media storage. Implementation remains unauthorized until every gate in
+`docs/reviews/DWCO-0.5-CONTRACT-APPROVAL.md` passes.
 
 Acceptance does not authorize shared-environment operation or production deployment. The
-process-local fan-out implementation must not be represented as production multi-instance realtime.
+existing process-local fan-out implementation must not be represented as production multi-instance
+realtime. A contract review does not add product completion weight.
 
 ## Explicitly outside the current boundary
 
