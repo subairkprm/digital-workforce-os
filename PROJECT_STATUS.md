@@ -1,8 +1,8 @@
 # Project status
 
-STATUS_AS_OF=2026-09-05
+STATUS_AS_OF=2026-09-06
 
-SOURCE_OF_TRUTH=merged main at 9b165d8; content restored to baseline 9188adc
+SOURCE_OF_TRUTH=merged main at ced18d0; content restored to baseline 9188adc
 
 ACCEPTED_WEIGHTED_COMPLETION=48_PERCENT_APPROXIMATE
 
@@ -36,8 +36,8 @@ PRODUCTION_AUTHORIZED=NO
 
 - The complete DWCO 0.4 implementation and acceptance remediation are on `main` through `607e6c0`.
 - Local fast, complete, and isolated Docker-backed gates passed for the reviewed implementation:
-  35 backend tests at 92% coverage, 8 admin tests and production build, 5 mobile tests, 3 governance
-  tests, dependency audits, Alembic `0005` round-trip, PostgreSQL 17, Redis 7, and readiness checks.
+  35 backend tests at 92% coverage, 8 admin tests and production build, 5 mobile tests, 13 governance
+  and hook tests, dependency audits, Alembic `0005` round-trip, PostgreSQL 17, Redis 7, and readiness checks.
 - Architecture, Identity/Security, and QA/Validation passed; DevOps/SRE passed with documented
   external exceptions. The live governance control plane remained API-healthy before and after CI.
 - Remote GitHub CI remains unresolved: Actions provides no usable run attestation because of the
